@@ -44,6 +44,7 @@ function bulletinIDHelper(id:any,res:any){
     for(const spl of splData[id].SPLs ){
       db.ref('/SPL_CVE_IDs').orderByKey().equalTo(spl).once('value', function(snapshot1) {
         output = snapshot1.val();
+        console.log("output"+output);
       }).catch(error => {console.log(error)});
     }
     //res.send(splData[id].SPLs);
