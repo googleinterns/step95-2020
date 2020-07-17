@@ -15,11 +15,14 @@ export const getCVE = functions.https.onRequest(main);
 app.get('/cves', (request, response) => {
     const bulletinID = String(request.query.bulletinid);
     if (bulletinID !== null){
-      bulletinIDHelper(bulletinID,response);
+      //bulletinIDHelper(bulletinID,response);
+      const isSPL = false;
+      SPLandBulletinIDHelper(bulletinID,response,isSPL);
     }
     const SPLID = String(request.query.splid);
     if (SPLID !== null){
-      SPLIDHelper(SPLID,response);
+      const isSPL = true;
+      SPLandBulletinIDHelper(SPLID,response,isSPL);
     }
     const SPLStart = request.query.splstart;
     if (SPLStart !== null){
@@ -40,33 +43,41 @@ app.get('/cves', (request, response) => {
 
 });
 
-function SPLIDHelper(id:any,res:any){
+function SPLandBulletinIDHelper(id:string,res:any,isSPL:boolean){
   const db = admin.database();
   const ref = db.ref('/CVEs');
   ref.once('value', function(snapshot) {
     let cves = snapshot.val();
-    cves = Enumerable.from(cves)
-    .where(function (obj) { return obj.value.patch_level === id })
-    .select(function (obj) { return obj.value })
-    .toArray();
+    if (isSPL){
+      cves = Enumerable.from(cves)
+      .where(function (obj) { return obj.value.patch_level === id })
+      .select(function (obj) { return obj.value })
+      .toArray();
+    }
+    else{
+      cves = Enumerable.from(cves)
+      .where(function (obj) { return obj.value.ASB === id })
+      .select(function (obj) { return obj.value })
+      .toArray();
+    }
     const result = {'CVEs': cves};
     res.send(result);
   }).catch(error => {console.log(error)});
 }
 
-function bulletinIDHelper(id:any,res:any){
-  const db = admin.database();
-  const ref = db.ref('/CVEs');
-  ref.once('value', function(snapshot) {
-    let cves = snapshot.val();
-    cves = Enumerable.from(cves)
-    .where(function (obj) { return obj.value.ASB === id })
-    .select(function (obj) { return obj.value })
-    .toArray();
-    const result = {'CVEs': cves};
-    res.send(result);
-  }).catch(error => {console.log(error)});
-}
+// function bulletinIDHelper(id:any,res:any){
+//   const db = admin.database();
+//   const ref = db.ref('/CVEs');
+//   ref.once('value', function(snapshot) {
+//     let cves = snapshot.val();
+//     cves = Enumerable.from(cves)
+//     .where(function (obj) { return obj.value.ASB === id })
+//     .select(function (obj) { return obj.value })
+//     .toArray();
+//     const result = {'CVEs': cves};
+//     res.send(result);
+//   }).catch(error => {console.log(error)});
+// }
 
 //function SPLStartHelper(id)
 
