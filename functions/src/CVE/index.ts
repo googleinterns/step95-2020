@@ -14,24 +14,24 @@ export const getCVE = functions.https.onRequest(main);
 
 app.get('/cves', (request, response) => {
   
-    const bulletinID = String(request.query.bulletinid);
-    const SPLID = String(request.query.splid);
+    const bulletinID = request.query.bulletinid;
+    const SPLID = request.query.splid;
     const SPLStart = request.query.splstart;
-    const CVEID = String(request.query.cveid);
+    const CVEID = request.query.cveid;
     const SPL1 = request.query.spl1;
     const SPL2 = request.query.spl2;  
 
     if (bulletinID !== null && bulletinID !== undefined){
-      bulletinIDHelper(bulletinID,response);
+      bulletinIDHelper(String(bulletinID),response);
     }
     else if (SPLID !== null && SPLID !== undefined){
-      SPLIDHelper(SPLID,response);
+      SPLIDHelper(String(SPLID),response);
     }
     else if (SPLStart !== null && SPLStart !== undefined){
       //TODO: call helper function to query for spl start data 
     } 
     else if (CVEID !== null && CVEID !== undefined){
-      CVEIDHelper(CVEID,response);
+      CVEIDHelper(String(CVEID),response);
     }
     else if (SPL1 !== null && SPL2 !== null
       && SPL1 !== undefined && SPL2 !== undefined){
@@ -39,29 +39,6 @@ app.get('/cves', (request, response) => {
     }
 
 });
-
-
-// function SPLandBulletinIDHelper(id:string,res:any,isSPL:boolean){
-//   const db = admin.database();
-//   const ref = db.ref('/CVEs');
-//   ref.once('value', function(snapshot) {
-//     let cves = snapshot.val();
-//     if (isSPL){
-//       cves = Enumerable.from(cves)
-//       .where(function (obj) { return obj.value.patch_level === id })
-//       .select(function (obj) { return obj.value })
-//       .toArray();
-//     }
-//     else{
-//       cves = Enumerable.from(cves)
-//       .where(function (obj) { return obj.value.ASB === id })
-//       .select(function (obj) { return obj.value })
-//       .toArray();
-//     }
-//     const result = {'CVEs': cves};
-//     res.send(result);
-//   }).catch(error => {console.log(error)});
-// }
 
 function SPLIDHelper(id:string,res:any){
   const db = admin.database();
