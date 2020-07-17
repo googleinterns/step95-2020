@@ -13,71 +13,83 @@ main.use(bodyParser.json());
 export const getCVE = functions.https.onRequest(main);
 
 app.get('/cves', (request, response) => {
+  
     const bulletinID = String(request.query.bulletinid);
-    if (bulletinID !== null){
-      //bulletinIDHelper(bulletinID,response);
-      const isSPL = false;
-      SPLandBulletinIDHelper(bulletinID,response,isSPL);
-    }
     const SPLID = String(request.query.splid);
-    if (SPLID !== null){
-      const isSPL = true;
-      SPLandBulletinIDHelper(SPLID,response,isSPL);
-    }
     const SPLStart = request.query.splstart;
-    if (SPLStart !== null){
-      //TODO: call helper function to query for spl start data 
+    const CVEID = String(request.query.cveid);
+    const SPL1 = request.query.spl1;
+    const SPL2 = request.query.spl2;  
+
+    if (bulletinID !== null && bulletinID !== undefined){
+      bulletinIDHelper(bulletinID,response);
     }
-    const CVEID = String(request.query.cveid); 
-    if (CVEID !== null){
+    else if (SPLID !== null && SPLID !== undefined){
+      SPLIDHelper(SPLID,response);
+    }
+    else if (SPLStart !== null && SPLStart !== undefined){
+      //TODO: call helper function to query for spl start data 
+    } 
+    else if (CVEID !== null && CVEID !== undefined){
       CVEIDHelper(CVEID,response);
     }
-
-    const SPL1 = request.query.spl1;
-    const SPL2 = request.query.spl2;
-    if (SPL1 !== null && SPL2 !== null){
+    else if (SPL1 !== null && SPL2 !== null
+      && SPL1 !== undefined && SPL2 !== undefined){
       //TODO: call helper function for data in between spls
     }
 
-    //response.send('Testing CVE get.');
-
 });
 
-function SPLandBulletinIDHelper(id:string,res:any,isSPL:boolean){
+
+// function SPLandBulletinIDHelper(id:string,res:any,isSPL:boolean){
+//   const db = admin.database();
+//   const ref = db.ref('/CVEs');
+//   ref.once('value', function(snapshot) {
+//     let cves = snapshot.val();
+//     if (isSPL){
+//       cves = Enumerable.from(cves)
+//       .where(function (obj) { return obj.value.patch_level === id })
+//       .select(function (obj) { return obj.value })
+//       .toArray();
+//     }
+//     else{
+//       cves = Enumerable.from(cves)
+//       .where(function (obj) { return obj.value.ASB === id })
+//       .select(function (obj) { return obj.value })
+//       .toArray();
+//     }
+//     const result = {'CVEs': cves};
+//     res.send(result);
+//   }).catch(error => {console.log(error)});
+// }
+
+function SPLIDHelper(id:string,res:any){
   const db = admin.database();
   const ref = db.ref('/CVEs');
   ref.once('value', function(snapshot) {
     let cves = snapshot.val();
-    if (isSPL){
-      cves = Enumerable.from(cves)
-      .where(function (obj) { return obj.value.patch_level === id })
-      .select(function (obj) { return obj.value })
-      .toArray();
-    }
-    else{
-      cves = Enumerable.from(cves)
-      .where(function (obj) { return obj.value.ASB === id })
-      .select(function (obj) { return obj.value })
-      .toArray();
-    }
+    cves = Enumerable.from(cves)
+    .where(function (obj) { return obj.value.patch_level === id })
+    .select(function (obj) { return obj.value })
+    .toArray();
     const result = {'CVEs': cves};
     res.send(result);
   }).catch(error => {console.log(error)});
 }
 
-// function bulletinIDHelper(id:any,res:any){
-//   const db = admin.database();
-//   const ref = db.ref('/CVEs');
-//   ref.once('value', function(snapshot) {
-//     let cves = snapshot.val();
-//     cves = Enumerable.from(cves)
-//     .where(function (obj) { return obj.value.ASB === id })
-//     .select(function (obj) { return obj.value })
-//     .toArray();
-//     const result = {'CVEs': cves};
-//     res.send(result);
-//   }).catch(error => {console.log(error)});
-// }
+function bulletinIDHelper(id:string,res:any){
+  const db = admin.database();
+  const ref = db.ref('/CVEs');
+  ref.once('value', function(snapshot) {
+    let cves = snapshot.val();
+    cves = Enumerable.from(cves)
+    .where(function (obj) { return obj.value.ASB === id })
+    .select(function (obj) { return obj.value })
+    .toArray();
+    const result = {'CVEs': cves};
+    res.send(result);
+  }).catch(error => {console.log(error)});
+}
 
 //function SPLStartHelper(id)
 
