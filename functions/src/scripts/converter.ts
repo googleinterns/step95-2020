@@ -320,16 +320,3 @@ function buildAOSPVersionCVEIDTree(tree: any): void {
 
 }
 
-
-// /*To run this script:
-//  1. Install yargs (npm i yargs, npm install @types/yargs) and ts-node (npm install -g typescript, npm install -g ts-node)
-//  2. cd into the src folder in step95-2020/functions
-//  3. Locate the file path for both the input file and where / what file you would like the output to be written to
-//  4. Run npm run lint and npm run build to be safe
-//  4. Run the command: ts-node --project ../tsconfig.json converter.ts --inputPath <file path for input file> --outputPath <file path for outputfile>.json
-//  NOTE: You are in the source folder of step95-2020/functions. If you want to move up a directory, remember to do ../ before the file name (same for output path)
-//        Also, the input should be the JSON representation of the bulletin data and the output is in JSON format - make sure your output file ends in .json.
-//  6. If the converter is successful, Completed conversion! should appear in your terminal.
-//  */
-
-
