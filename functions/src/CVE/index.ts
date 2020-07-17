@@ -3,15 +3,16 @@ import * as express from 'express';
 import * as bodyParser from "body-parser";
 import * as admin from 'firebase-admin';
 import * as Enumerable from 'linq';
-
+import deepEqual = require('deep-equal');
+ 
 const app = express();
 const main = express();
-
+ 
 main.use(app);
 main.use(bodyParser.json());
-
+ 
 export const getCVE = functions.https.onRequest(main);
-
+ 
 app.get('/cves', (request, response) => {
   
     const bulletinID = request.query.bulletinid;
@@ -21,8 +22,13 @@ app.get('/cves', (request, response) => {
     const spl1 = request.query.spl1;
     const spl2 = request.query.spl2;  
     const androidVersion = request.query.androidVersion;
+    const v1 = request.query.v1; 
+    const v2 = request.query.v2; 
 
     if (bulletinID){
+      if (v1 && v2){
+        version1And2VulDifference(String(bulletinID), String(v1), String(v2), response);
+      }
       getCvesWithBulletinID(String(bulletinID),response);
     }
     else if (splID){
@@ -94,6 +100,89 @@ function splStartHelper(id : string, res : any) : void {
   }
   res.send(result);}, 
     function(error) { console.log(error);});
+}
+ 
+function version1And2VulDifference(bulletin: string, version1: string, version2: string, res: any){
+ const db = admin.database();
+ const ref = db.ref('/CVE_History');
+ const wholeVersion1 = bulletin + ":" + version1; 
+ const wholeVersion2 = bulletin + ":" + version2;
+ const version1And2Vul = ref.once('value');
+ const version1And2FinalSet = version1And2Vul.then((snapshot) => {
+   const cves = snapshot.val();
+   const cves1 = Enumerable.from(cves)
+   .where(function(obj) { return obj.value[wholeVersion1]!==undefined})
+   .select(function (obj){return obj.value[wholeVersion1]})
+   .toArray();
+   const cves2 = Enumerable.from(cves)
+   .where(function(obj){return obj.value[wholeVersion2]!==undefined})
+   .select(function(obj){return obj.value[wholeVersion2]})
+   .toArray();
+   const cves1Set = createSet(cves1);
+   const cves2Set = createSet(cves2);
+ 
+   const cvesFinal = symmetricDifferenceBetweenSets(cves1Set, cves2Set);
+ 
+   const overlappingCVEs = intersectionBetweenSets(cves1Set, cves2Set);
+ 
+   const cves1Map = new Map(cves1.map(x => [x.CVE, x]));
+   const cves2Map = new Map (cves2.map(x => [x.CVE,x]));
+ 
+   for (const element of overlappingCVEs){
+    if (!deepEqual(cves1Map.get(element), cves2Map.get(element))){
+      cvesFinal.add(element);
+    }
+   }
+ 
+  const promises = [];
+  for(const cve of cvesFinal){
+    promises.push(cve);
+  }
+  return Promise.all(promises);
+ })
+ 
+ version1And2FinalSet.then((cvesFinalSet) => {
+   const cveList = [];
+   for (const cve of cvesFinalSet) {
+     cveList.push(cve);
+   }  
+  const result = {'CVEs': cveList};
+   res.send(result);
+ })
+ .catch(error => {res.status(500).send("Error getting cves for bulletin between v1 and v2: " + error)});
+ 
+}
+ 
+function createSet(data: any): Set<any> {
+ const returnSet = new Set();
+ for (const element of data){
+   returnSet.add(element.CVE);
+ }
+ return returnSet;
+}
+ 
+ 
+function symmetricDifferenceBetweenSets(setA: any, setB:any) : Set<any> {
+ const difference = new Set(setA)
+ for (const element of setB) {
+     if (difference.has(element)) {
+         difference.delete(element)
+     } else {
+         difference.add(element)
+     }
+ }
+ return difference;
+}
+ 
+function intersectionBetweenSets (setA: any, setB: any) : Set<any> {
+ const intersection = new Set();
+ for (const element of setB){
+   if (setA.has(element)){
+     intersection.add(element);
+   }
+ }
+ return intersection;
+ 
 }
 
 function getCveWithCveID(id:any,res:any){
