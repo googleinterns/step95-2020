@@ -11,8 +11,6 @@ To build our RESTful API using serverless technology, we use RTDB (i.e. Firebase
 ## Table of Contents
 * [Prerequisites](#Prerequisites)
 * [Initialize project](#Initialize-project)
-* [Routing with route params/query params](#Routing)
-* [Triggering functions](#Triggering-functions)
 * [Local testing](#Local-testing)
 * [Deploy](#Deploy)
 
@@ -94,119 +92,6 @@ There are three important things under the `functions` directory.
 - `Package.json` is a Json file used by node, containing modules and their dependencies (e.g. Firebase Admin, Firebase functions) for the usage of the functions.
 - `node_modules` is a folder where NPM installed those modules during the setup.
 
-##### Change config file `firebase.json` as follows:
-```sh
-{
-  ....
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/api/v1/**",
-        "function": "webApi"
-      }
-    ]
-  }
-}
-```
-
-##### Now, open `index.ts`:
-#### Import main libraries
-```sh
-import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin';
-import * as express from 'express';
-import * as bodyParser from "body-parser";
-```
-- Functions for Firebase SDK creates Cloud Functions and sets up triggers.
-- Admin SDK provides access to FCM, - Authentication, and Firebase Realtime Database.
-- Express is a web framework that manages routers and apps, and “app” is an instance of express.
-- Cors handles cross domain requests.
-
-
-#### Initialize firebase and Express.js server
-```sh
-admin.initializeApp(functions.config().firebase);
-const app = express();
-const main = express();
-```
-#### Configure the server
-```sh
-main.use('/api/v1', app);
-main.use(bodyParser.json());
-```
-- '/api/v1' is the path for receiving the request
-- bodyParser.json() sets JSON as the main parser for processing requests body
-
-## Routing
-#### Defining routes
-
-The following route responds with “Hi!” on the homepage:
-
-```sh
-app.get('/warmup1', (req, res) => {
-   const content = 'Hi!';
-   res.send(content);
-});
-```
-
-- ”app.get” corresponds to a GET request. It needs to be changed accordingly if it responds to other requests.
-
-> See the result locally by going to this url: http://localhost:5001/projectID/us-central1/webApi/api/v1/warmup1
-> 
-> E.g. http://localhost:5001/step95-2020/us-central1/webApi/api/v1/warmup
-> 
-> Note: The port may be different on your local machine.
-
-
-#### Query parameters
-The following route takes query parameters from the request. With the query param specified in the url as shown below, the returned content is the same as (a).
-
-```sh
-app.get('/warmup2', (req, res) => {
-   const content = req.query.text;
-   res.send(content);
-});
-```
->Sample url: http://localhost:5001/step95-2020/us-central1/webApi/api/v1/warmup2?text=Hi!
-
-
-#### Route parameters
-The following route takes route parameters from the request, “/: text” in the path specifies the route parameter. With the route param specified in the url as shown below, the returned content is the same as (a).
-
-```sh
-app.get('/warmup3/:text', (req, res) => {
-   const content = req.params.text;
-   res.send(content);
-});
-```
->Sample url: http://localhost:5001/step95-2020/us-central1/webApi/api/v1/warmup3/Hi!
-
-## Triggering functions
-
-After defining the route, do:
-
-```sh
-export const webApi = functions.https.onRequest(main);
-```
-
-- functions.https creates a function that handles HTTP events. The event handler for an HTTP function listens for the onRequest() event, which supports routers and apps managed by the Express web framework.
-
-#### Some notes:
-Cloud Functions act as microservices that respond to various events.
-Possible triggers that we may want to use:
-| **Area**      | **JS representation** | **event handlers**    |
-| :---        | :---        | :---         |
-| HTTP      | functions.https       | onRequest   |
-| Realtime Database    | functions.database.ref('path')        | onCreate, onUpdate, onDelete, onWrite    |
-| Authentication   | functions.auth.user()       | onCreate, onDelete    |
-| Pub/Sub   | functions.pubsub.topic('topic-name')        | onPublish    |
-
 ## Local testing
 Run:
 ```sh
@@ -216,9 +101,7 @@ $ firebase emulators:start
 ```
 Check the output for the URL:
 
-> http://localhost:5001/projectID/us-central1/webApi/api/v1/functionName
-> 
-> E.g. http://localhost:5001/step95-2020/us-central1/webApi/api/v1/warmup
+> http://localhost:5001/projectID/us-central1/ROUTE
 
 Three different ways to check the output:
 
@@ -235,5 +118,5 @@ $ firebase deploy
 ```
 Check the output for the URL:
 ```sh
-$ curl https://step95-2020.firebaseapp.com/api/v1/warmup -H "Authorization: bearer $(gcloud auth print-identity-token)"
+$ curl https://step95-2020.firebaseapp.com/ROUTE -H "Authorization: bearer $(gcloud auth print-identity-token)"
 ```
