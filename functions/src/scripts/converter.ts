@@ -171,7 +171,7 @@ function buildBulletinSPLTree(tree: any): void {
         let array = null;
         if (set !== undefined) {
             const iterator = set[Symbol.iterator]();
-            array = Array.from(iterator);
+            array = Array.from(iterator);           
             refBulletinSPL.child(key).set(array).catch(error => { console.log(error) });
         }
     }
@@ -184,9 +184,11 @@ function buildSPLCVEIDTree(tree: any): void {
     let refSPLCVEID = db.ref('/SPL_CVE_IDs');
     refSPLCVEID.remove().catch(error => { console.log(error) });
     const SPLCVEIDMap = new Map<string, Set<any>>();
+    const SPLPublishDateMap = new Map();
     for (const CVE in tree) {
         const CVEData = tree[CVE];
         const currentSPL = CVEData.patch_level;
+        SPLPublishDateMap.set(currentSPL, CVEData.published_date);
         if (currentSPL !== undefined) {
             const previousSet = SPLCVEIDMap.get(currentSPL);
             if (previousSet !== undefined) {
@@ -201,11 +203,16 @@ function buildSPLCVEIDTree(tree: any): void {
     refSPLCVEID = db.ref('/SPL_CVE_IDs');
     for (const key of SPLCVEIDMap.keys()) {
         const set = SPLCVEIDMap.get(key);
+        const publishDate = SPLPublishDateMap.get(key);
         let array = null;
         if (set !== undefined) {
             const iterator = set[Symbol.iterator]();
             array = Array.from(iterator);
-            refSPLCVEID.child(key).set(array).catch(error => { console.log(error) });
+          //  const addSet = {'CVE_IDs': array}
+            const addSet: Record<string, object> = {};
+            addSet['CVE_IDs'] = array; 
+            addSet['Published_Date'] = publishDate
+            refSPLCVEID.child(key).set(addSet).catch(error => { console.log(error) });
         }
     }
     console.log("SPl CVE IDs uploaded");
