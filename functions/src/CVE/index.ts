@@ -51,7 +51,9 @@ function SPLIDHelper(id:string,res:any){
     .toArray();
     const result = {'CVEs': cves};
     res.send(result);
-  }).catch(error => {console.log(error)});
+  }).catch(error => {
+    console.log("error getting CVEs for spl:"+ error);
+  });
 }
 
 function bulletinIDHelper(id:string,res:any){
@@ -65,7 +67,9 @@ function bulletinIDHelper(id:string,res:any){
     .toArray();
     const result = {'CVEs': cves};
     res.send(result);
-  }).catch(error => {console.log(error)});
+  }).catch(error => {
+    console.log("error getting CVEs for bulletinID:"+ error);
+  });
 }
 
 //function SPLStartHelper(id)
@@ -76,7 +80,9 @@ function CVEIDHelper(id:any,res:any){
   ref.orderByKey().equalTo(id).once('value', function(snapshot) {
     const cveData = snapshot.val();
     res.send(cveData[id]);
-  }).catch(error => {console.log(error)});
+  }).catch(error => {
+    console.log("error getting details for CVEID:"+ error);
+  });
 }
 
 //function SPL1and2Helper(id1, id2)
