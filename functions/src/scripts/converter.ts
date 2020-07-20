@@ -48,10 +48,17 @@ function replacePeriodsWithUnderscores(source: any): void {
 
 function getCVEs(data: { vulnerabilities: any; ASB: any; published: any; }, versionNumber: string): Record<string, object> {
     const subCVEData: Record<string, object> = {};
+    let regex = /^CVE-\d{4}-\d{3,7}$/;
     for (const vul of data.vulnerabilities) {
+        if (!regex.test(vul.CVE)){
+            let hyphenCount = vul.CVE.match(/-/g).length;
+            if (hyphenCount !== 3){ //allow for CVE-___-___-1
+                continue; 
+            }
+        }
         const cveData: Record<string, object> = {};
         cveData['published_date'] = data.published;
-        cveData['BulletinVersion'] = Object(versionNumber);
+        cveData['BulletinVersion'] = Object(versionNumber);5
         for (const key of Object.keys(vul)) {
             cveData[key] = vul[key];
         }
