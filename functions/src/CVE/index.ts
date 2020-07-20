@@ -15,25 +15,25 @@ export const getCVE = functions.https.onRequest(main);
 app.get('/cves', (request, response) => {
   
     const bulletinID = request.query.bulletinid;
-    const SPLID = request.query.splid;
-    const SPLStart = request.query.splstart;
-    const CVEID = request.query.cveid;
-    const SPL1 = request.query.spl1;
-    const SPL2 = request.query.spl2;  
+    const splID = request.query.splid;
+    const splStart = request.query.splstart;
+    const cveID = request.query.cveid;
+    const spl1 = request.query.spl1;
+    const spl2 = request.query.spl2;  
 
     if (bulletinID){
       getCvesWithBulletinID(String(bulletinID),response);
     }
-    else if (SPLID){
-      getCvesWithSplID(String(SPLID),response);
+    else if (splID){
+      getCvesWithSplID(String(splID),response);
     }
-    else if (SPLStart){
+    else if (splStart){
       //TODO: call helper function to query for spl start data 
     } 
-    else if (CVEID){
-      getCveWithCveID(String(CVEID),response);
+    else if (cveID){
+      getCveWithCveID(String(cveID),response);
     }
-    else if (SPL1 && SPL2){
+    else if (spl1 && spl2){
       //TODO: call helper function for data in between spls
     }
 
