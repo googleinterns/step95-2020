@@ -21,42 +21,25 @@ app.get('/cves', (request, response) => {
     const SPL1 = request.query.spl1;
     const SPL2 = request.query.spl2;  
 
-    if (bulletinID !== null && bulletinID !== undefined){
-      bulletinIDHelper(String(bulletinID),response);
+    if (bulletinID){
+      getCvesWithBulletinID(String(bulletinID),response);
     }
-    else if (SPLID !== null && SPLID !== undefined){
-      SPLIDHelper(String(SPLID),response);
+    else if (SPLID){
+      getCvesWithSplID(String(SPLID),response);
     }
-    else if (SPLStart !== null && SPLStart !== undefined){
+    else if (SPLStart){
       //TODO: call helper function to query for spl start data 
     } 
-    else if (CVEID !== null && CVEID !== undefined){
-      CVEIDHelper(String(CVEID),response);
+    else if (CVEID){
+      getCveWithCveID(String(CVEID),response);
     }
-    else if (SPL1 !== null && SPL2 !== null
-      && SPL1 !== undefined && SPL2 !== undefined){
+    else if (SPL1 && SPL2){
       //TODO: call helper function for data in between spls
     }
 
 });
 
-function SPLIDHelper(id:string,res:any){
-  const db = admin.database();
-  const ref = db.ref('/CVEs');
-  ref.once('value', function(snapshot) {
-    let cves = snapshot.val();
-    cves = Enumerable.from(cves)
-    .where(function (obj) { return obj.value.patch_level === id })
-    .select(function (obj) { return obj.value })
-    .toArray();
-    const result = {'CVEs': cves};
-    res.send(result);
-  }).catch(error => {
-    console.log("error getting CVEs for spl:"+ error);
-  });
-}
-
-function bulletinIDHelper(id:string,res:any){
+function getCvesWithBulletinID(id:string,res:any){
   const db = admin.database();
   const ref = db.ref('/CVEs');
   ref.once('value', function(snapshot) {
@@ -68,20 +51,36 @@ function bulletinIDHelper(id:string,res:any){
     const result = {'CVEs': cves};
     res.send(result);
   }).catch(error => {
-    console.log("error getting CVEs for bulletinID:"+ error);
+    res.send("error getting CVEs for bulletinID:"+ error);
+  });
+}
+
+function getCvesWithSplID(id:string,res:any){
+  const db = admin.database();
+  const ref = db.ref('/CVEs');
+  ref.once('value', function(snapshot) {
+    let cves = snapshot.val();
+    cves = Enumerable.from(cves)
+    .where(function (obj) { return obj.value.patch_level === id })
+    .select(function (obj) { return obj.value })
+    .toArray();
+    const result = {'CVEs': cves};
+    res.send(result);
+  }).catch(error => {
+    res.send("error getting CVEs for spl:"+ error);
   });
 }
 
 //function SPLStartHelper(id)
 
-function CVEIDHelper(id:any,res:any){
+function getCveWithCveID(id:any,res:any){
   const db = admin.database();
   const ref = db.ref('/CVEs');
   ref.orderByKey().equalTo(id).once('value', function(snapshot) {
     const cveData = snapshot.val();
     res.send(cveData[id]);
   }).catch(error => {
-    console.log("error getting details for CVEID:"+ error);
+    res.send("error getting details for CVEID:"+ error);
   });
 }
 
