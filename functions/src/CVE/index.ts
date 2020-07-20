@@ -4,8 +4,6 @@ import * as bodyParser from "body-parser";
 import * as admin from 'firebase-admin';
 import * as Enumerable from 'linq';
 
-const fs = require('fs');
-
 const app = express();
 const main = express();
 
@@ -13,16 +11,6 @@ main.use(app);
 main.use(bodyParser.json());
 
 export const getCVE = functions.https.onRequest(main);
-
-const userToken : string = fs.readFileSync('userToken.txt').toString();
-var userDecodedToken : any = null;
-
-admin.auth().verifyIdToken(userToken).then(function (decodedToken) {
-  userDecodedToken = decodedToken;
-  console.log(userDecodedToken.uid);
-}).catch(function (error) {
-  console.log(error);
-});
 
 app.get('/cves', (request, response) => {
     const bulletinID = request.query.bulletinid;
@@ -34,11 +22,8 @@ app.get('/cves', (request, response) => {
       //TODO: call helper function to query for spl data
     }
     const SPLStart = String(request.query.splstart);
-    if (SPLStart !== null && (userDecodedToken !== null && userDecodedToken.uid == 'c32xG9Qb0ddlBHj8LGF3414gWxn1')){
-      // if (userDecodedToken.u)
+    if (SPLStart !== null){
       splStartHelper(SPLStart, response); 
-    } else{
-      console.log('User does not have access!');
     }
     const CVEID = request.query.cveid; 
     if (CVEID !== null){
@@ -83,14 +68,3 @@ function splStartHelper(id : string, res : any) : void {
   res.send(result);
   }, function(error) { console.log(error);});
   }
-
-  // function getUserToken() : string {
-  //   var result : string = "";
-  //   fs.readFile('userToken.txt', 'utf8', function(error : any, data : string) {
-  //     if (error) throw error;
-  //     result = data;
-  //     console.log('content from file: '  + result);
-  //     return result;
-  //   });
-  //   return result;
-  // }
