@@ -82,8 +82,9 @@ function postCVEHistory(data: any, tree: any, version_number: string): void {
 
 function buildCVEHistoryTree(tree: any, versionHistory: string, CVETree: any): void {
     //add new version sub section to cve history if needed 
-    const initalID = Object.keys(CVETree)[0];
+    const initalID = Object.keys(JSONData)[0];
     const currentASB = CVETree[initalID]['ASB'];
+    console.log(currentASB);
     const longVersionNumberHistory = currentASB + ":" + versionHistory;
     const db = admin.database();
     const ref = db.ref('/CVE_History');
