@@ -55,7 +55,7 @@ function getCvesWithBulletinID(id:string,res:any){
     const result = {'CVEs': cves};
     res.send(result);
   }).catch(error => {
-    res.send("error getting CVEs for bulletinID:"+ error);
+    res.status(500).send("error getting CVEs for bulletinID:"+ error);
   });
 }
 
@@ -71,7 +71,7 @@ function getCvesWithSplID(id:string,res:any){
     const result = {'CVEs': cves};
     res.send(result);
   }).catch(error => {
-    res.send("error getting CVEs for spl:"+ error);
+    res.status(500).send("error getting CVEs for spl:"+ error);
   });
 }
 
@@ -84,7 +84,7 @@ function getCveWithCveID(id:any,res:any){
     const cveData = snapshot.val();
     res.send(cveData[id]);
   }).catch(error => {
-    res.send("error getting details for CVEID:"+ error);
+    res.status(500).send("error getting details for CVEID:"+ error);
   });
 }
 
@@ -125,7 +125,9 @@ function getChangesBtwSpls(id1:string,id2:string,res:any){
     const cvesBetweenSpls = {CVEs: cveList};
     res.send(cvesBetweenSpls);
   })
-  .catch(error => {res.send("error getting cves between Spls: " + error)});
+  .catch(error => {
+    res.status(500).send("error getting cves between Spls: " + error)
+  });
 }
 
 function getCvesWithAndroidVersion(version:string,res:any){
@@ -150,6 +152,8 @@ function getCvesWithAndroidVersion(version:string,res:any){
   }   
   res.send(JSON.stringify(cveList));
   })
-  .catch(error => {res.send("error getting CVEs for AndroidVersion: " + error)});
+  .catch(error => {
+    res.status(500).send("error getting CVEs for AndroidVersion: " + error)
+  });
 }
 

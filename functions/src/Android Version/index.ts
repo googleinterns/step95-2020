@@ -46,6 +46,6 @@ function getSupportedAndroidVersions(res:any){
         const supportedVersion = {supportedVersion: verEndDateList}
         res.send(supportedVersion);
     }).catch(error => {
-        res.send("error getting supprted Android Versions: " + error);
+        res.status(500).send("error getting supprted Android Versions: " + error);
     });
 }

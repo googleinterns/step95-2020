@@ -52,7 +52,7 @@ function getSplsCvesWithBulletinID(id:string,res:any){
     res.send(JSON.stringify(output));
   })
   .catch(error => {
-    res.send("error getting details for bulletinID: " + error)
+    res.status(500).send("error getting details for bulletinID: " + error)
   });
 }
 
@@ -104,6 +104,6 @@ function getSplsCvesWithAndroidVersion(version:string,res:any){
     }
     res.send(JSON.stringify(output));
   }).catch(error => {
-    res.send("error getting spls and cveIDs for AndroidVersion: " + error)
+    res.status(500).send("error getting spls and cveIDs for AndroidVersion: " + error)
   });
 }
