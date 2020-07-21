@@ -82,7 +82,9 @@ function postCVEHistory(data: any, tree: any, version_number: string): void {
 
 function buildCVEHistoryTree(tree: any, versionHistory: string, CVETree: any): void {
     //add new version sub section to cve history if needed 
-    const longVersionNumberHistory = "BulletinVersion:" + versionHistory;
+    const initalID = Object.keys(CVETree)[0];
+    const currentASB = CVETree[initalID]['ASB'];
+    const longVersionNumberHistory = currentASB + ":" + versionHistory;
     const db = admin.database();
     const ref = db.ref('/CVE_History');
     if (tree === null) {
@@ -90,7 +92,7 @@ function buildCVEHistoryTree(tree: any, versionHistory: string, CVETree: any): v
         for (const ID in CVETree) {
             const tempVersion = CVETree[ID]['BulletinVersion'];
             delete CVETree[ID]['BulletinVersion'];
-            const tempLongVersionNumber = "BulletinVersion:" + tempVersion;
+            const tempLongVersionNumber = CVETree[ID]['ASB'] + ":" + tempVersion;
             ref.child(ID).child(tempLongVersionNumber).set(CVETree[ID]).catch(error => { console.log(error) });
         }
     } else {
@@ -98,7 +100,7 @@ function buildCVEHistoryTree(tree: any, versionHistory: string, CVETree: any): v
             if (!Object.values(CVETree).includes(CVE)) {
                 const tempVersion = CVETree[CVE]['BulletinVersion'];
                 delete CVETree[CVE]['BulletinVersion'];
-                const tempLongVersionNumber = "BulletinVersion:" + tempVersion;
+                const tempLongVersionNumber = CVETree[CVE]['ASB'] + ":" + tempVersion;
                 ref.child(CVE).child(tempLongVersionNumber).set(CVETree[CVE]).catch(error => { console.log(error) });
             }
         }
