@@ -15,6 +15,31 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [ {
+      "source" : "/sendData",
+      "function": "writeData"
+    }, 
+    {
+      "source": "/cves",
+      "function": "getCVEFunction"
+    }, 
+    {
+      "source": "/spls",
+      "function": "getSPLFunction"
+    }, 
+    {
+      "source": "/bulletins",
+      "function": "getBulletinFunction"
+    },
+    {
+      "source": "/androidVersions/**",
+      "function": "getAndroidVersionFunction"
+    }, 
+    {
+      "source": "/supportedAndroidVersions",
+      "function": "getAndroidVersionFunction"
+    }
     ]
   },
   "emulators": {
