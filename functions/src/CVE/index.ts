@@ -23,14 +23,8 @@ app.get('/cves', (request, response) => {
     if (bulletinID){
       getCvesWithBulletinID(String(bulletinID),response);
     }
-<<<<<<< HEAD
     else if (splID){
       getCvesWithSplID(String(splID),response);
-=======
-    const SPLStart = String(request.query.splstart);
-    if (SPLStart !== null){
-      splStartHelper(SPLStart, response); 
->>>>>>> Update index.ts
     }
     else if (splStart){
       //TODO: call helper function to query for spl start data 
@@ -101,7 +95,6 @@ function splStartHelper(id : string, res : any) : void {
   }
   res.send(result);
   }, function(error) { console.log(error);});
-<<<<<<< HEAD
 }
 
 function getCveWithCveID(id:any,res:any){
@@ -114,8 +107,3 @@ function getCveWithCveID(id:any,res:any){
     res.send("error getting details for CVEID:"+ error);
   });
 }
-
-//function SPL1and2Helper(id1, id2)
-=======
-  }
->>>>>>> Update index.ts
