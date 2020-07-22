@@ -35,7 +35,7 @@ app.get('/cves', (request, response) => {
       getCveWithCveID(String(cveID),response);
     }
     else if (spl1 && spl2){
-      getChangesBtwSpls(String(spl1),String(spl2),response);
+      getChangesBetweenSPLs(String(spl1),String(spl2),response);
     }
     else if (androidVersion){
       getCvesWithAndroidVersion(String(androidVersion),response);
@@ -55,7 +55,7 @@ function getCvesWithBulletinID(id:string,res:any){
     const result = {'CVEs': cves};
     res.send(result);
   }).catch(error => {
-    res.status(500).send("error getting CVEs for bulletinID:"+ error);
+    res.status(400).send("error getting CVEs for bulletinID:"+ error);
   });
 }
 
@@ -71,7 +71,7 @@ function getCvesWithSplID(id:string,res:any){
     const result = {'CVEs': cves};
     res.send(result);
   }).catch(error => {
-    res.status(500).send("error getting CVEs for spl:"+ error);
+    res.status(400).send("error getting CVEs for spl:"+ error);
   });
 }
 
@@ -84,11 +84,11 @@ function getCveWithCveID(id:any,res:any){
     const cveData = snapshot.val();
     res.send(cveData[id]);
   }).catch(error => {
-    res.status(500).send("error getting details for CVEID:"+ error);
+    res.status(400).send("error getting details for CVEID:"+ error);
   });
 }
 
-function getChangesBtwSpls(id1:string,id2:string,res:any){
+function getChangesBetweenSPLs(id1:string,id2:string,res:any){
   let newSpl: string;
   let oldSpl: string;
   if (id1 > id2){
@@ -126,7 +126,7 @@ function getChangesBtwSpls(id1:string,id2:string,res:any){
     res.send(cvesBetweenSpls);
   })
   .catch(error => {
-    res.status(500).send("error getting cves between Spls: " + error)
+    res.status(400).send("error getting cves between Spls: " + error)
   });
 }
 
@@ -153,7 +153,7 @@ function getCvesWithAndroidVersion(version:string,res:any){
   res.send(JSON.stringify(cveList));
   })
   .catch(error => {
-    res.status(500).send("error getting CVEs for AndroidVersion: " + error)
+    res.status(400).send("error getting CVEs for AndroidVersion: " + error)
   });
 }
 

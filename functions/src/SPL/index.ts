@@ -34,7 +34,7 @@ function getSplsWithBulletinID(id:string, res:any){;
     const splOutput = {Spls : splData[id]}
     res.send(splOutput);
   }).catch(error => {
-    res.status(500).send("error getting spls for bulletinID: " + error)
+    res.status(400).send("error getting spls for bulletinID: " + error)
   });
 }
 
@@ -65,7 +65,7 @@ function getSplsWithAndroidVersion(version:string, res:any){
   const splOutput = {Spls: splArray};
   res.send(splOutput);
   }).catch(error => {
-    res.status(500).send("error getting spls for AndroidVersion: " + error)
+    res.status(400).send("error getting spls for AndroidVersion: " + error)
   });
 }
 
