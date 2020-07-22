@@ -73,11 +73,11 @@ function getCvesWithSplID(id:string,res:any){
 }
 
 function splStartHelper(id : string, res : any) : void {
-  var db = admin.database();
-  var ref = db.ref('/CVEs');
+  const db = admin.database();
+  const ref = db.ref('/CVEs');
 
   ref.on("value", function(snapshot) {
-    let cves = snapshot.val();
+    const cves = snapshot.val();
     let cve_array : Array<any> = [];
     
     const cve_jsons : any = Enumerable.from(cves)
