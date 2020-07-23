@@ -20,6 +20,7 @@ app.get('/cves', (request, response) => {
     const cveID = request.query.cveid;
     const spl1 = request.query.spl1;
     const spl2 = request.query.spl2;  
+    const androidVersion = request.query.androidVersion;
 
     if (bulletinID){
       getCvesWithBulletinID(String(bulletinID),response);
@@ -34,8 +35,11 @@ app.get('/cves', (request, response) => {
       getCveWithCveID(String(cveID),response);
     }
     else if (spl1 && spl2){
-      //TODO: call helper function for data in between spls
+      getChangesBetweenSPLs(String(spl1),String(spl2),response);
     }
+    else if (androidVersion){
+      getCvesWithAndroidVersion(String(androidVersion),response);
+    }  
 
 });
 
@@ -51,7 +55,7 @@ function getCvesWithBulletinID(id:string,res:any){
     const result = {'CVEs': cves};
     res.send(result);
   }).catch(error => {
-    res.send("error getting CVEs for bulletinID:"+ error);
+    res.status(400).send("error getting CVEs for bulletinID:"+ error);
   });
 }
 
@@ -67,7 +71,7 @@ function getCvesWithSplID(id:string,res:any){
     const result = {'CVEs': cves};
     res.send(result);
   }).catch(error => {
-    res.send("error getting CVEs for spl:"+ error);
+    res.status(400).send("error getting CVEs for spl:"+ error);
   });
 }
 
@@ -80,9 +84,76 @@ function getCveWithCveID(id:any,res:any){
     const cveData = snapshot.val();
     res.send(cveData[id]);
   }).catch(error => {
-    res.send("error getting details for CVEID:"+ error);
+    res.status(400).send("error getting details for CVEID:"+ error);
   });
 }
 
-//function SPL1and2Helper(id1, id2)
+function getChangesBetweenSPLs(id1:string,id2:string,res:any){
+  let newSpl: string;
+  let oldSpl: string;
+  if (id1 > id2){
+    newSpl = id1;
+    oldSpl = id2;
+  }
+  else{
+    newSpl = id2;
+    oldSpl = id1;
+  }
+  const db = admin.database();
+  const ref = db.ref('/SPL_CVE_IDs');
+  const splCvesPromise = ref.once('value');
+  const cvePromise =  splCvesPromise.then((snapshot) => {
+    let splCves = snapshot.val();
+    splCves = Enumerable.from(splCves)
+    .where(function (obj) { return obj.key <= newSpl && obj.key > oldSpl })
+    .select(function (obj) { return obj.value.CVE_IDs })
+    .toArray();
+    const mergedCvelist = [].concat.apply([], splCves);
+    const promises = [];
+    for(const cve of mergedCvelist){
+      const cveDataPromise = db.ref('/CVEs').orderByKey().equalTo(cve).once('value');
+      promises.push(cveDataPromise);
+    }
+    return Promise.all(promises);
+  })
+
+  cvePromise.then((cves) => {
+    const cveList = [];
+    for (const cve of cves) {
+      cveList.push(cve.val());
+    }   
+    const cvesBetweenSpls = {CVEs: cveList};
+    res.send(cvesBetweenSpls);
+  })
+  .catch(error => {
+    res.status(400).send("error getting cves between Spls: " + error)
+  });
+}
+
+function getCvesWithAndroidVersion(version:string,res:any){
+  const db = admin.database();
+  const ref = db.ref('/AOSP_Version_CVE_IDs');
+  let cveData:any;
+  const aospVerToCvePromise = ref.orderByKey().equalTo(version).once('value')
+  const allCvePromise = aospVerToCvePromise.then((snapshot) => {
+  cveData = snapshot.val();
+  const promises = [];
+  for(const cveID of cveData[version]["CVE_IDs"]){
+    const cvePromise = db.ref('/CVEs').orderByKey().equalTo(cveID).once('value');
+    promises.push(cvePromise);
+  }
+  return Promise.all(promises);
+  })
+  
+  allCvePromise.then((cves) => {
+  const cveList = [];
+  for (const cve of cves) {
+    cveList.push(cve.val());
+  }   
+  res.send(JSON.stringify(cveList));
+  })
+  .catch(error => {
+    res.status(400).send("error getting CVEs for AndroidVersion: " + error)
+  });
+}
 
