@@ -4,6 +4,8 @@ import * as bodyParser from "body-parser";
 import * as admin from 'firebase-admin';
 import * as Enumerable from 'linq';
 
+const fs = require('fs');
+
 const app = express();
 const main = express();
 
@@ -11,6 +13,16 @@ main.use(app);
 main.use(bodyParser.json());
 
 export const getCVE = functions.https.onRequest(main);
+
+const userToken : string = fs.readFileSync('userToken.txt').toString();
+var userDecodedToken : any = null;
+
+admin.auth().verifyIdToken(userToken).then(function (decodedToken) {
+  userDecodedToken = decodedToken;
+  console.log(userDecodedToken.uid);
+}).catch(function (error) {
+  console.log(error);
+});
 
 app.get('/cves', (request, response) => {
   
@@ -28,15 +40,19 @@ app.get('/cves', (request, response) => {
       getCvesWithSplID(String(splID),response);
     }
     else if (splStart){
-      //TODO: call helper function to query for spl start data 
+      if (splStart !== null && (userDecodedToken !== null && userDecodedToken.uid == 'c32xG9Qb0ddlBHj8LGF3414gWxn1')){
+        splStartHelper(String(splStart), response);
+      }
+      else { response.send('Use does not have access');
+      }
     } 
     else if (cveID){
       getCveWithCveID(String(cveID),response);
     }
     else if (spl1 && spl2){
       //TODO: call helper function for data in between spls
+      // SPL1and2Helper(SPL1, SPL2, response);
     }
-
 });
 
 function getCvesWithBulletinID(id:string,res:any){
@@ -86,3 +102,27 @@ function getCveWithCveID(id:any,res:any){
 
 //function SPL1and2Helper(id1, id2)
 
+function splStartHelper(id : string, res : any) : void {
+  var db = admin.database();
+  var ref = db.ref('/CVEs');
+
+  ref.on("value", function(snapshot) {
+    let cves = snapshot.val();
+    let cve_array : Array<any> = [];
+    
+    const cve_jsons : any = Enumerable.from(cves)
+      .where(function(obj) {return obj.value['ASB'] < id})
+      .select(function (obj){
+        return obj.value;
+      })
+
+    for (const cve of cve_jsons){
+      cve_array.push(cve);
+    }
+
+  const result = {
+    'CVEs' : cve_array
+  }
+  res.send(result);
+  }, function(error) { console.log(error);});
+  }
