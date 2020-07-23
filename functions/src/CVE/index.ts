@@ -29,7 +29,7 @@ app.get('/cves', (request, response) => {
       getCvesWithSplID(String(splID),response);
     }
     else if (splStart){
-      //TODO: call helper function to query for spl start data 
+      splStartHelper(String(splStart),response);
     } 
     else if (cveID){
       getCveWithCveID(String(cveID),response);
