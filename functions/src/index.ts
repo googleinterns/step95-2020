@@ -36,16 +36,23 @@ export const getAndroidVersionFunction = androidVersionFunction.getAndroidVersio
 export const getData = functions.https.onRequest(main);
 const fs = require('fs');
 
+const validateToken = async (req : any, res : any) => {
+  if (req.get['token']){ 
+    console.log('header exists');
+    res.send('no header');
+  }
+  else { console.log('header doesnt exist');}
+}
+
 app.post('/data', (request : any, response : any) => {
-  var userToken = request.body['token'];
-  if (userToken != 'error') {
-  // console.log('token written into file' + userToken);
-  fs.writeFile('userToken.txt', userToken, 'utf8', (error : any) => {
-    if (error) throw error;
-    console.log('User token has been successfully transfered!');
-  }
-  )} else {
-    console.log('error trying to save user token');
-  }
- })
- 
+
+ var userToken = request.body['token'];
+ if (userToken != 'error') {
+ fs.writeFile('userToken.txt', userToken, 'utf8', (error : any) => {
+   if (error) throw error;
+   console.log('User token has been successfully transfered!');
+ }
+ )} else {
+   console.log('error trying to save user token');
+ }
+})

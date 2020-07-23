@@ -3,7 +3,6 @@ import * as express from 'express';
 import * as bodyParser from "body-parser";
 import * as admin from 'firebase-admin';
 import * as Enumerable from 'linq';
-
 const app = express();
 const main = express();
 
@@ -39,7 +38,6 @@ admin.auth().verifyIdToken(userToken).then(function (decodedToken) {
   console.log(error);
 });
 }
-
 
 function getCVE_functions(uid : string, request : any, response : any){
   const bulletinID = request.query.bulletinid;
@@ -102,7 +100,6 @@ function getCvesWithSplID(id:string,res:any){
     res.send("error getting CVEs for spl:"+ error);
   });
 }
-
 //function SPLStartHelper(id)
 
 function getCveWithCveID(id:any,res:any){
