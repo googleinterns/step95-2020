@@ -39,10 +39,6 @@
     {
       "source": "/supportedAndroidVersions",
       "function": "getAndroidVersionFunction"
-    },
-    {
-      "source": "/notif",
-      "function": "getNotification"
     }
     ]
   },
