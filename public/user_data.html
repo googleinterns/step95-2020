@@ -4,7 +4,7 @@
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <title>Logged In</title>
- <div id="test123"></div>
+ <div id="tokenContainer"></div>
 </head>
 <body>
  <button id='generateToken'>Get User Token</button>
@@ -20,7 +20,7 @@
    firebase.auth().onAuthStateChanged(function(user) {
      if (user.email != null){
        firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
-         document.getElementById("test123").innerHTML = idToken;
+         document.getElementById("tokenContainer").innerHTML = idToken;
          var data = {'token' : idToken};
       
          const options = {
