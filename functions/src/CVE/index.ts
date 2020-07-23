@@ -117,7 +117,6 @@ function splStartHelper(id : string, res : any) : void {
   ref.on("value", function(snapshot) {
     let cves = snapshot.val();
     let cve_array : Array<any> = [];
-    
     const cve_jsons : any = Enumerable.from(cves)
       .where(function(obj) {return obj.value['ASB'] < id})
       .select(function (obj){
