@@ -12,13 +12,14 @@ import * as bodyParser from "body-parser";
   appId: "1:525367632678:web:476053e80e5f22c6f417e7", 
   measurementId: "G-QJE1CBXKGN"
   };
-  // Initialize Firebase
+
 admin.initializeApp(firebaseConfig);
 
 import * as CVEFunction from './CVE/index';
 import * as SPLFunction from './SPL/index';
 import * as bulletinFunction from './bulletin/index';
 import * as androidVersionFunction from './Android Version/index';
+import * as notificationFunction from './notification/index';
 
 const app = express();
 const main = express();
@@ -30,4 +31,6 @@ export const getCVEFunction = CVEFunction.getCVE;
 export const getSPLFunction = SPLFunction.getSPL;
 export const getBulletinFunction = bulletinFunction.getBulletin;
 export const getAndroidVersionFunction = androidVersionFunction.getAndroidVersion;
-
+export const storeEmailFunction = notificationFunction.accountCreate;
+export const notifyNewVersionFunction = notificationFunction.notifyNewVersion;
+export const notifyNewReleaseFunction = notificationFunction.notifyNewRelease;
