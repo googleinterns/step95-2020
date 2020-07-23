@@ -3,6 +3,7 @@ import * as express from 'express';
 import * as bodyParser from "body-parser";
 import * as admin from 'firebase-admin';
 import * as Enumerable from 'linq';
+
 const app = express();
 const main = express();
 
@@ -16,17 +17,15 @@ app.get('/cves', (request, response) => {
  })
   
 function getUserToken(request : any, response : any, useToken : boolean) {
-if (useToken){
-  if (!request.headers['token']) {
-    response.send('Token required for API usage!');
-  } else {
-    const userToken : string = request.headers['token'];
-    decodeUserIdToken(userToken, request, response);
+  if (useToken){
+    if (!request.headers['token']) {
+      response.send('Token required for API usage!');
+    } else {
+      const userToken : string = request.headers['token'];
+      decodeUserIdToken(userToken, request, response);
+    }
   }
-}
-else{
-  getCVE_functions('bypass', request, response);
-}
+  else { getCVE_functions('bypass', request, response);}
 }
 
 function decodeUserIdToken(userToken : string, request : any, response : any) {
@@ -54,18 +53,15 @@ function getCVE_functions(uid : string, request : any, response : any){
     getCvesWithSplID(String(splID),response);
   }
   else if (splStart){
-    if (splStart !== null && (uid == 'c32xG9Qb0ddlBHj8LGF3414gWxn1')){
+    if (splStart !== null && (uid == '')){
       splStartHelper(String(splStart), response);
-    }
-    else { response.send('Use does not have access');
-    }
+    } else { response.send('Use does not have access');}
   } 
   else if (cveID){
     getCveWithCveID(String(cveID),response);
   }
   else if (spl1 && spl2){
     //TODO: call helper function for data in between spls
-    // SPL1and2Helper(SPL1, SPL2, response);
   }
 }
 
@@ -100,7 +96,6 @@ function getCvesWithSplID(id:string,res:any){
     res.send("error getting CVEs for spl:"+ error);
   });
 }
-//function SPLStartHelper(id)
 
 function getCveWithCveID(id:any,res:any){
   const db = admin.database();
@@ -126,16 +121,13 @@ function splStartHelper(id : string, res : any) : void {
     const cve_jsons : any = Enumerable.from(cves)
       .where(function(obj) {return obj.value['ASB'] < id})
       .select(function (obj){
-        return obj.value;
-      })
-
-    for (const cve of cve_jsons){
-      cve_array.push(cve);
-    }
-
+        return obj.value;})
+  for (const cve of cve_jsons){
+    cve_array.push(cve);
+  }
   const result = {
     'CVEs' : cve_array
   }
-  res.send(result);
-  }, function(error) { console.log(error);});
+  res.send(result);}, 
+    function(error) { console.log(error);});
   }
