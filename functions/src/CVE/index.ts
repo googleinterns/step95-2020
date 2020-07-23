@@ -13,57 +13,31 @@ main.use(bodyParser.json());
 export const getCVE = functions.https.onRequest(main);
 
 app.get('/cves', (request, response) => {
-  getUserToken(request, response, true);
- })
   
-function getUserToken(request : any, response : any, useToken : boolean) {
-  if (useToken){
-    if (!request.headers['token']) {
-      response.send('Token required for API usage!');
-    } else {
-      const userToken : string = request.headers['token'];
-      decodeUserIdToken(userToken, request, response);
+    const bulletinID = request.query.bulletinid;
+    const splID = request.query.splid;
+    const splStart = request.query.splstart;
+    const cveID = request.query.cveid;
+    const spl1 = request.query.spl1;
+    const spl2 = request.query.spl2;  
+
+    if (bulletinID){
+      getCvesWithBulletinID(String(bulletinID),response);
     }
-  }
-  else { getCVE_functions('bypass', request, response);}
-}
+    else if (splID){
+      getCvesWithSplID(String(splID),response);
+    }
+    else if (splStart){
+      //TODO: call helper function to query for spl start data 
+    } 
+    else if (cveID){
+      getCveWithCveID(String(cveID),response);
+    }
+    else if (spl1 && spl2){
+      //TODO: call helper function for data in between spls
+    }
 
-function decodeUserIdToken(userToken : string, request : any, response : any) {
-let userDecodedToken : any = null;
-admin.auth().verifyIdToken(userToken).then(function (decodedToken) {
-  userDecodedToken = decodedToken;
-  getCVE_functions(userDecodedToken.uid, request, response)
-}).catch(function (error) {
-  console.log(error);
 });
-}
-
-function getCVE_functions(uid : string, request : any, response : any){
-  const bulletinID = request.query.bulletinid;
-  const splID = request.query.splid;
-  const splStart = request.query.splstart;
-  const cveID = request.query.cveid;
-  const spl1 = request.query.spl1;
-  const spl2 = request.query.spl2;  
-
-  if (bulletinID){
-    getCvesWithBulletinID(String(bulletinID),response);
-  }
-  else if (splID){
-    getCvesWithSplID(String(splID),response);
-  }
-  else if (splStart){
-    if (splStart !== null && (uid == '')){
-      splStartHelper(String(splStart), response);
-    } else { response.send('Use does not have access');}
-  } 
-  else if (cveID){
-    getCveWithCveID(String(cveID),response);
-  }
-  else if (spl1 && spl2){
-    //TODO: call helper function for data in between spls
-  }
-}
 
 function getCvesWithBulletinID(id:string,res:any){
   const db = admin.database();
@@ -97,6 +71,8 @@ function getCvesWithSplID(id:string,res:any){
   });
 }
 
+//function SPLStartHelper(id)
+
 function getCveWithCveID(id:any,res:any){
   const db = admin.database();
   const ref = db.ref('/CVEs');
@@ -110,24 +86,3 @@ function getCveWithCveID(id:any,res:any){
 
 //function SPL1and2Helper(id1, id2)
 
-function splStartHelper(id : string, res : any) : void {
-  var db = admin.database();
-  var ref = db.ref('/CVEs');
-
-  ref.on("value", function(snapshot) {
-    let cves = snapshot.val();
-    let cve_array : Array<any> = [];
-    
-    const cve_jsons : any = Enumerable.from(cves)
-      .where(function(obj) {return obj.value['ASB'] < id})
-      .select(function (obj){
-        return obj.value;})
-  for (const cve of cve_jsons){
-    cve_array.push(cve);
-  }
-  const result = {
-    'CVEs' : cve_array
-  }
-  res.send(result);}, 
-    function(error) { console.log(error);});
-  }
