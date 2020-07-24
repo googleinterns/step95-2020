@@ -10,7 +10,6 @@ import * as CVEFunction from './CVE/index';
 import * as SPLFunction from './SPL/index';
 import * as bulletinFunction from './bulletin/index';
 import * as androidVersionFunction from './Android Version/index';
-import {error} from 'console';
 
 const app = express();
 const main = express();
@@ -25,29 +24,14 @@ export const getAndroidVersionFunction =
   androidVersionFunction.getAndroidVersion;
 
 export const getData = functions.https.onRequest(main);
-let userToken = '';
 
 app.post('/data', (request: any, response: any) => {
   if (request.body['email']) {
     const email: string = request.body['email'];
-    setAdminPriveleges(email)
-      .then(() => {
-        response.send('admin_done');
-      })
-      .catch(error);
-  } else if (request.body['userToken']) {
-    userToken = request.body['userToken'];
-    admin
-      .auth()
-      .verifyIdToken(userToken)
-      .then(claims => {
-        if (claims.isAdmin === true) {
-          console.log('user is admin');
-        } else {
-          console.log('not admin');
-        }
-      })
-      .catch(error);
+    setAdminPriveleges(email).catch(error => {
+        response.status(400).send("error giving admin privileges:"+ error);
+      }
+    )
   }
 });
 
