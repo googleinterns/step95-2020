@@ -74,8 +74,7 @@ function getCVEs(data: { vulnerabilities: any; ASB: any; published: any; }, vers
     return result;
 }
 
-
-function checkCVEValidity(ID: string, regExpression: any): any {
+ function checkCVEValidity(ID: string, regExpression: any): any {
     //These are the types of malformations found thus far
     const finalID: any[] = [];
     if (ID.match(/\n/)) { //ex: CVE-2018-9409\n

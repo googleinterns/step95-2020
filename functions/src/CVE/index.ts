@@ -38,7 +38,11 @@ app.get('/cves', (request, response) => {
       splStartHelper(String(splStart),response);
     } 
     else if (cveID){
-      getCveWithCveID(String(cveID),response);
+      if (!checkCVEValidity(cveID)){
+        response.status(400).send("Error: CVE ID is malformed.");
+      } else{
+        getCveWithCveID(String(cveID),response);
+      }
     }
     else if (spl1 && spl2){
       getChangesBetweenSPLs(String(spl1),String(spl2),response);
@@ -61,7 +65,7 @@ function getCvesWithBulletinID(id:string,res:any){
     const result = {'CVEs': cves};
     res.send(result);
   }).catch(error => {
-    res.status(400).send("error getting CVEs for bulletinID:"+ error);
+    res.status(500).send("error getting CVEs for bulletinID:"+ error);
   });
 }
 
@@ -77,7 +81,7 @@ function getCvesWithSplID(id:string,res:any){
     const result = {'CVEs': cves};
     res.send(result);
   }).catch(error => {
-    res.status(400).send("error getting CVEs for spl:"+ error);
+    res.status(500).send("error getting CVEs for spl:"+ error);
   });
 }
 
@@ -190,9 +194,12 @@ function getCveWithCveID(id:any,res:any){
   const ref = db.ref('/CVEs');
   ref.orderByKey().equalTo(id).once('value', function(snapshot) {
     const cveData = snapshot.val();
+    if (cveData === null || cveData === undefined){
+      res.status(404).send("Error: ID is not present in the database");
+    }
     res.send(cveData[id]);
   }).catch(error => {
-    res.status(400).send("error getting details for CVEID:"+ error);
+    res.status(500).send("error getting details for CVEID:"+ error);
   });
 }
 
@@ -234,7 +241,7 @@ function getChangesBetweenSPLs(id1:string,id2:string,res:any){
     res.send(cvesBetweenSpls);
   })
   .catch(error => {
-    res.status(400).send("error getting cves between Spls: " + error)
+    res.status(500).send("error getting cves between Spls: " + error)
   });
 }
 
@@ -261,6 +268,25 @@ function getCvesWithAndroidVersion(version:string,res:any){
   res.send(JSON.stringify(cveList));
   })
   .catch(error => {
-    res.status(400).send("error getting CVEs for AndroidVersion: " + error)
+    res.status(500).send("error getting CVEs for AndroidVersion: " + error)
   });
 }
+
+function checkCVEValidity(ID: any) : boolean {
+  const regex = /^CVE-\d{4}-\d{3,7}$/;
+  if (!regex.test(ID)){
+    const hyphenString = ID.match(/-/g);
+    if (hyphenString){
+      const hyphenCount = hyphenString.length; 
+      const idCVEArray = ID.split("-");
+      if (hyphenCount === 3){
+        if (idCVEArray[3].length === 1){
+          return true; 
+        }
+      }
+    } 
+    return false; 
+  }
+  return true; 
+}
+
