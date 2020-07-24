@@ -7,3 +7,7 @@
   ```sh
   $ firebase functions:config:set sendgrid.key="THE API KEY" 
   ```
+5) Install sendgrid module:
+  ```sh
+  $ npm install --save @sendgrid/mail
+  ```
