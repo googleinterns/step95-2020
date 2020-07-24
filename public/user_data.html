@@ -16,37 +16,15 @@
  };
  firebase.initializeApp(firebaseConfig);
  document.getElementById('generateToken').addEventListener("click", generateToken);
-  function generateToken() {
-   firebase.auth().onAuthStateChanged(function(user) {
-     if (user.email != null){
-       firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
-         document.getElementById("tokenContainer").innerHTML = idToken;
-         var data = {'token' : idToken};
-      
-         const options = {
-           method: 'POST',
-           headers: {
-             'Content-Type': 'application/json'
-           },
-           body: JSON.stringify(data)
-         };
-         fetch('/data', options);
-       }).catch(function(error) {
-         console.log(error);
-       });
-     } else {
-        var data = {'token' : 'error'};
-       const options = {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json'
-         },
-         body: JSON.stringify(data)
-       };
-       document.getElementById("test123").innerHTML = "not logged in";
-       fetch('/data', options);
-       }
-   });
- }
+ 
+function generateToken() {
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user){
+      firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
+        document.getElementById("tokenContainer").innerHTML = idToken;
+      });
+    }
+  });
+}
 </script>
 </html>
