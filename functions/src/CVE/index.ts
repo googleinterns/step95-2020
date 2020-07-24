@@ -13,7 +13,6 @@ main.use(bodyParser.json());
 export const getCVE = functions.https.onRequest(main);
 
 app.get('/cves', (request, response) => {
-  
     const bulletinID = request.query.bulletinid;
     const splID = request.query.splid;
     const splStart = request.query.splstart;
@@ -29,7 +28,7 @@ app.get('/cves', (request, response) => {
       getCvesWithSplID(String(splID),response);
     }
     else if (splStart){
-      //TODO: call helper function to query for spl start data 
+      splStartHelper(String(splStart), response);
     } 
     else if (cveID){
       getCveWithCveID(String(cveID),response);
@@ -39,8 +38,7 @@ app.get('/cves', (request, response) => {
     }
     else if (androidVersion){
       getCvesWithAndroidVersion(String(androidVersion),response);
-    }  
-
+    }
 });
 
 function getCvesWithBulletinID(id:string,res:any){
@@ -75,7 +73,26 @@ function getCvesWithSplID(id:string,res:any){
   });
 }
 
-//function SPLStartHelper(id)
+function splStartHelper(id : string, res : any) : void {
+  var db = admin.database();
+  var ref = db.ref('/CVEs');
+
+  ref.on("value", function(snapshot) {
+    let cves = snapshot.val();
+    let cve_array : Array<any> = [];
+    const cve_jsons : any = Enumerable.from(cves)
+      .where(function(obj) {return obj.value['ASB'] < id})
+      .select(function (obj){
+        return obj.value;})
+    for (const cve of cve_jsons){
+      cve_array.push(cve);
+    }
+    const result = {
+      'CVEs' : cve_array
+    }
+    res.send(result);}, 
+      function(error) { console.log(error);});
+}
 
 function getCveWithCveID(id:any,res:any){
   const db = admin.database();
@@ -156,24 +173,3 @@ function getCvesWithAndroidVersion(version:string,res:any){
     res.status(400).send("error getting CVEs for AndroidVersion: " + error)
   });
 }
-
-function splStartHelper(id : string, res : any) : void {
-  var db = admin.database();
-  var ref = db.ref('/CVEs');
-
-  ref.on("value", function(snapshot) {
-    let cves = snapshot.val();
-    let cve_array : Array<any> = [];
-    const cve_jsons : any = Enumerable.from(cves)
-      .where(function(obj) {return obj.value['ASB'] < id})
-      .select(function (obj){
-        return obj.value;})
-  for (const cve of cve_jsons){
-    cve_array.push(cve);
-  }
-  const result = {
-    'CVEs' : cve_array
-  }
-  res.send(result);}, 
-    function(error) { console.log(error);});
-  }

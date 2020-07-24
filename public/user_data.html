@@ -4,56 +4,57 @@
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <title>Logged In</title>
- <div id="test123"></div>
+ <div id="tokenContainer"></div>
 </head>
-<body>
+<body onload="sendUserEmail()">
  <button id='generateToken'>Get User Token</button>
 </body>
 <script src="https://www.gstatic.com/firebasejs/7.4.0/firebase.js"></script>
 <script type="text/javascript">
  const firebaseConfig = {
-   apiKey: "AIzaSyBfQKMxa1azXidOZJjT8UYDm5BnU4s2bKA",
-   authDomain: "step95-2020.firebaseapp.com",
-   databaseURL: "https://step95-2020.firebaseio.com",
-   projectId:"step95-2020",
-   storageBucket: "step95-2020.appspot.com",
-   messagingSenderId: "525367632678",
-   appId: "1:525367632678:web:476053e80e5f22c6f417e7",
-   measurementId: "G-QJE1CBXKGN"
+
  };
  firebase.initializeApp(firebaseConfig);
  document.getElementById('generateToken').addEventListener("click", generateToken);
-  function generateToken() {
-   firebase.auth().onAuthStateChanged(function(user) {
-     if (user.email != null){
-       firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
-         document.getElementById("test123").innerHTML = idToken;
-         var data = {'token' : idToken};
-      
-         const options = {
-           method: 'POST',
-           headers: {
-             'Content-Type': 'application/json'
-           },
-           body: JSON.stringify(data)
-         };
-         fetch('/data', options);
-       }).catch(function(error) {
-         console.log(error);
-       });
-     } else {
-        var data = {'token' : 'error'};
-       const options = {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json'
-         },
-         body: JSON.stringify(data)
-       };
-       document.getElementById("test123").innerHTML = "not logged in";
-       fetch('/data', options);
-       }
-   });
- }
+ 
+
+function generateToken() {
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user){
+      firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
+        document.getElementById("tokenContainer").innerHTML = idToken;
+        const data = {
+            'userToken' : idToken
+        };
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        fetch('/data', options);
+      });
+    }
+  });
+}
+
+ function sendUserEmail() {
+    firebase.auth().onAuthStateChanged(function(user) {
+        const email = user.email;
+        const data = {
+            'email' : email
+        };
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        console.log('sent user email');
+        fetch('/data', options);
+    });
+    }
 </script>
 </html>
