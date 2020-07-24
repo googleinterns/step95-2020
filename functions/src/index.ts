@@ -36,6 +36,7 @@ app.post('/data', (request: any, response: any) => {
 });
 
 async function setAdminPriveleges(userEmail: string): Promise<void> {
+
   const user = await admin.auth().getUserByEmail(userEmail);
   if (userEmail.split('@')[1] === 'google.com') {
     if (user.customClaims && (user.customClaims as any).isAdmin === true) {
