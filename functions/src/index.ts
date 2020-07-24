@@ -29,7 +29,7 @@ let userToken: string = "";
 app.post('/data', (request: any, response: any) => {
   if (request.body['email']){
     const email : string = request.body['email'];
-    setAdminPriveleges(email).then(() => {
+    setAdminPrivileges(email).then(() => {
       response.send('admin_done');
     }).catch(error);
   } else if(request.body['userToken']){
@@ -41,7 +41,7 @@ app.post('/data', (request: any, response: any) => {
   }
 });
 
-async function setAdminPriveleges(userEmail: string) : Promise<void> {
+async function setAdminPrivileges(userEmail: string) : Promise<void> {
   const user = await admin.auth().getUserByEmail(userEmail);
   if (userEmail.split('@')[1] === 'google.com'){
     if (user.customClaims && (user.customClaims as any).isAdmin === true) {
