@@ -208,7 +208,11 @@ function writeToDatabaseCVETree(data: any, versionNum: string): void{
     const currentTree = newRef.once('value');
     const currentTreeCheck = currentTree.then((snapshot) => {
         result = snapshot.toJSON();
-        versionOK = validVersionNumber(versionNum, result);
+        if (result === null){
+            versionOK = true; 
+        } else {
+            versionOK = validVersionNumber(versionNum, result);
+        }
         const promises = [];
         promises.push(versionOK);
         return Promise.all(promises);
@@ -226,6 +230,7 @@ function writeToDatabaseCVETree(data: any, versionNum: string): void{
        
     }).catch(error => {console.log("Error checking bulletin version and writing cve tree to db" + error)});
 }
+
 
 
 function validVersionNumber(versionNum: string, tree: any): boolean {
@@ -249,16 +254,21 @@ function pullFromDatabase(version_full: string, version_short: string): void {
     let result = null;
     refCVE.once('value', function (snapshot) {
         result = snapshot.toJSON();
-        buildBulletinSPLTree(result);
-        buildSPLCVEIDTree(result);
-        buildAOSPVersionASBCVEIDTree(result);
-        buildAOSPVersionCVEIDTree(result);
+        const bulletinSPLTree = buildBulletinSPLTree(result);
+        sendBulletinSPLTreeToDB(bulletinSPLTree);
+        const splCVEIDTree = buildSPLCVEIDTree(result);
+        sendSPLCVEIDTreeToDB(splCVEIDTree[0], splCVEIDTree[1]);
+        const aospVersionASBCVEIDTree = buildAOSPVersionASBCVEIDTree(result);
+        sendAOSPVersionASBCVEIDTreeToDB(aospVersionASBCVEIDTree[0], aospVersionASBCVEIDTree[1], aospVersionASBCVEIDTree[2]);
+        const aospVersionCVEIDTree = buildAOSPVersionCVEIDTree(result);
+        sendAOSPVersionCVEIDTreeToDB(aospVersionCVEIDTree);
         postCVEHistory(JSONData, result, version_short);
-        buildBulletinVersionTree(result);
+        const bulletinVersionTree = buildBulletinVersionTree(result);
+        sendBulletinVersionTreeToDB(bulletinVersionTree);
     }).catch(error => { console.log("Error fetching CVE Tree from database:" + error) });
 }
 
-function buildBulletinSPLTree(tree: any): void {
+function buildBulletinSPLTree(tree: any): Map<string, Set<any>> {
     clearTreeInDB("Bulletin_SPL");
     const asbSPlMap = new Map<string, Set<any>>();
     for (const cve in tree) {
@@ -279,7 +289,7 @@ function buildBulletinSPLTree(tree: any): void {
             }
         }
     }
-    sendBulletinSPLTreeToDB(asbSPlMap);
+    return asbSPlMap; 
 }
 
 function clearTreeInDB(treeToClear: string): void {
@@ -304,7 +314,7 @@ function sendBulletinSPLTreeToDB(treeToSend: Map<string, Set<any>>): void {
 }
 
 
-function buildSPLCVEIDTree(tree: any): void {
+function buildSPLCVEIDTree(tree: any): Array<any> {
     clearTreeInDB("SPL_CVE_IDs");
     const splCVEIDMap = new Map<string, Set<any>>();
     const splPublishDateMap = new Map();
@@ -326,7 +336,8 @@ function buildSPLCVEIDTree(tree: any): void {
             }
         }
     }
-    sendSPLCVEIDTreeToDB(splCVEIDMap, splPublishDateMap);
+    const returnArray = [splCVEIDMap, splPublishDateMap];
+    return returnArray; 
 }
 
 function sendSPLCVEIDTreeToDB(treeToSend: Map<string, Set<any>>, publishMap: any): void {
@@ -348,7 +359,7 @@ function sendSPLCVEIDTreeToDB(treeToSend: Map<string, Set<any>>, publishMap: any
     console.log("SPl CVE IDs uploaded");
 }
 
-function buildAOSPVersionASBCVEIDTree(tree: any): void {
+function buildAOSPVersionASBCVEIDTree(tree: any): Array<any> {
     clearTreeInDB("AOSP_Version_ASB_CVE_IDs");
     const asbCVEIDMap = new Map<string, Set<any>>();
     const aospASBMap = new Map<string, Set<any>>();
@@ -380,7 +391,8 @@ function buildAOSPVersionASBCVEIDTree(tree: any): void {
             }
         }
     }
-    sendAOSPVersionASBCVEIDTreeToDB(aospASBMap, asbCVEIDMap, tree);
+    const returnArray = [aospASBMap, asbCVEIDMap, tree];
+    return returnArray; 
 }
 
 function sendAOSPVersionASBCVEIDTreeToDB(aospASBMapSend: Map<string, Set<any>>, asbCVEIDMapSend: Map<string, Set<any>>, tree: any): void {
@@ -422,7 +434,7 @@ function isAndroidVersionSupported(tree: any, aospVersion: string, ID: string): 
     return false;
 }
 
-function buildAOSPVersionCVEIDTree(tree: any): void {
+function buildAOSPVersionCVEIDTree(tree: any): Map<string, Set<any>> {
     clearTreeInDB("AOSP_Version_CVE_IDs");
     const aospCVEIDMap = new Map<string, Set<any>>();
     for (const cve in tree) {
@@ -442,8 +454,7 @@ function buildAOSPVersionCVEIDTree(tree: any): void {
             }
         }
     }
-
-    sendAOSPVersionCVEIDTreeToDB(aospCVEIDMap);
+    return aospCVEIDMap;
 }
 
 function sendAOSPVersionCVEIDTreeToDB(treeToSend: Map<string, Set<any>>): void {
@@ -463,7 +474,7 @@ function sendAOSPVersionCVEIDTreeToDB(treeToSend: Map<string, Set<any>>): void {
     console.log("AOSP version CVE IDs tree uploaded");
 }
 
-function buildBulletinVersionTree(tree: any): void {
+function buildBulletinVersionTree(tree: any): Map<string, Array<string>> {
     //Bulletin version tree with latest version stored
     //for each bulletin
     const bulletinVersionMap = new Map<string, Array<string>>();
@@ -476,7 +487,7 @@ function buildBulletinVersionTree(tree: any): void {
             bulletinVersionMap.set(currentASB, arrayToAdd);
         }
     }
-    sendBulletinVersionTreeToDB(bulletinVersionMap);
+    return bulletinVersionMap;
 }
 
 function sendBulletinVersionTreeToDB(treeToSend: Map<string, Array<string>>): void {
