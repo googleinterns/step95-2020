@@ -1,20 +1,10 @@
 import * as functions from 'firebase-functions';
-import * as express from 'express';
-import * as bodyParser from "body-parser";
 import * as admin from 'firebase-admin';
 import * as Enumerable from 'linq';
 import deepEqual = require('deep-equal');
 import * as checks from '../errorChecks';
 
-const app = express();
-const main = express();
-
-main.use(app);
-main.use(bodyParser.json());
-
-export const getCVE = functions.https.onRequest(main);
-
-app.get('/cves', (request, response) => {
+export const getCVE = functions.https.onRequest((request, response) => {
 
   const bulletinID = request.query.bulletinid;
   const splID = request.query.splid;
@@ -52,7 +42,8 @@ app.get('/cves', (request, response) => {
   }
   else if (cveID) {
     if (!checks.checkCVEValidity(cveID)) {
-      response.status(400).send("Error: CVE ID is malformed.");
+      //response.status(400).send("Error: CVE ID is malformed.");
+      response.send("Error: CVE ID is malformed.");
     }
     getCveWithCveID(String(cveID), response);
 

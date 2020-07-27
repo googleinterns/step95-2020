@@ -14,16 +14,17 @@
     "fix": "gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
-    "posttest": "npm run check"
+    "posttest": "npm run check",
+    "test": "mocha -r ts-node/register --reporter spec test/**/*.ts"
   },
   "engines": {
     "node": "10"
   },
   "main": "lib/index.js",
   "dependencies": {
-    "@sendgrid/mail": "^7.2.1",
-    "@siderite/linqer": "^1.2.2",
+    "@sendgrid/mail": "^7.2.2",
     "@types/deep-equal": "^1.0.1",
+    "@types/sinon": "^9.0.4",
     "@types/yargs": "^15.0.5",
     "body-parser": "^1.19.0",
     "deep-equal": "^2.0.3",
@@ -34,11 +35,17 @@
     "yargs": "^15.4.1"
   },
   "devDependencies": {
-    "tslint": "^5.12.0",
-    "typescript": "^3.8.3",
-    "firebase-functions-test": "^0.2.0",
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.0",
+    "@types/node": "^13.11.1",
+    "chai": "^4.2.0",
+    "firebase-functions-test": "^0.2.1",
     "gts": "^2.0.2",
-    "@types/node": "^13.11.1"
+    "mocha": "^8.0.1",
+    "sinon": "^9.0.2",
+    "ts-node": "^8.10.2",
+    "tslint": "^5.12.0",
+    "typescript": "^3.8.3"
   },
   "private": true
 }
