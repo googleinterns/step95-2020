@@ -1,30 +1,178 @@
 <!DOCTYPE html>
 <html>
-<head>
- <meta charset="utf-8">
- <meta name="viewport" content="width=device-width, initial-scale=1">
- <title>Logged In</title>
- <div id="tokenContainer"></div>
-</head>
-<body>
- <button id='generateToken'>Get User Token</button>
-</body>
-<script src="https://www.gstatic.com/firebasejs/7.4.0/firebase.js"></script>
-<script type="text/javascript">
- const firebaseConfig = {
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ASB API Web Demo</title>
+    <div id='tokenDisplay'>
+      <textarea id='tokenContainer'></textarea>
+    </div>
+  </head>
+  <body onload="sendUserEmail()">
+    <button id='generateToken'>Get User Token</button>
+    <div>
+      <div>
+        <label for='bulletinid'>Enter bulletinID for CVEs</label>
+        <input type='text' id='bulletinid' name='bulletinid'/>
+        <button id='bulletinidButton'>Submit</button>
+      </div>
+      <div>
+        <label for='splstart'>Enter splStart for CVEs</label>
+        <input type='text' id='splstart' name='splstart'/>
+        <button id='splStartButton'>Submit</button>
+      </div>
+      <div>
+        <label for='splid'>Enter SPL for CVEs</label>
+        <input type='text' id='splid' name='splid'/>
+        <button id='cveswithsplidButton'>Submit</button>
+      </div>
+      <div>
+        <label for='cveid'>Enter cveId for a CVE</label>
+        <input type='text' id='cveid' name='cveid'/>
+        <button id='cveidButton'>Submit</button>
+      </div>
+      <div>
+        <label for='androidVersion'>Enter Android version for CVEs</label>
+        <input type='text' id='androidVersion' name='androidVersion'/>
+        <button id='androidVersionButton'>Submit</button>
+      </div>
+      <div>
+        <label for='spl1'>Enter spl1</label>
+        <input type='text' id='spl1' name='spl1'/>
+        <label for='spl2'>Enter spl2</label>
+        <input type='text' id='spl2' name='spl2'/>
+        <button id='spl1spl2Button'>Submit</button> 
+      </div>
+    </div>
+    <div style='clear: right'>
+      <iframe name='displayFrame' id='displayFrame' scrolling='no' width='50%' height="100%"></iframe>
+    </div>
+  </body>
+  <script src="https://www.gstatic.com/firebasejs/7.4.0/firebase.js"></script>
+  <script type="text/javascript">
+    const firebaseConfig = {
+        apiKey: "AIzaSyBfQKMxa1azXidOZJjT8UYDm5BnU4s2bKA",
+        authDomain: "step95-2020.firebaseapp.com",
+        databaseURL: "https://step95-2020.firebaseio.com",
+        projectId: "step95-2020",
+        storageBucket: "step95-2020.appspot.com",
+        messagingSenderId: "525367632678",
+        appId: "1:525367632678:web:476053e80e5f22c6f417e7",
+        measurementId: "G-QJE1CBXKGN"
+    };
+    firebase.initializeApp(firebaseConfig);
+    document.getElementById('generateToken').addEventListener("click", generateToken);
+    
+    document.getElementById('splStartButton').addEventListener("click", function() { sendRequest('splstart', false);});
+    document.getElementById('bulletinidButton').addEventListener("click", function() { sendRequest('bulletinid', false);});
+    document.getElementById('cveswithsplidButton').addEventListener("click", function() { sendRequest('splid', false);});
+    document.getElementById('cveidButton').addEventListener("click", function() { sendRequest('cveid', false);});
+    document.getElementById('spl1spl2Button').addEventListener("click", function() { sendRequest('spl1spl2', true);});
 
- };
- firebase.initializeApp(firebaseConfig);
- document.getElementById('generateToken').addEventListener("click", generateToken);
- 
-function generateToken() {
-  firebase.auth().onAuthStateChanged(function(user) {
-    if (user){
-      firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
-        document.getElementById("tokenContainer").innerHTML = idToken;
+
+    function generateToken() {
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user){
+          firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
+            document.getElementById("tokenContainer").innerHTML = idToken;
+            const data = {
+                'userToken' : idToken
+            };
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            };
+            fetch('/data', options);
+          });
+        }
       });
     }
-  });
-}
-</script>
+
+    function sendRequest(inputId, hasTwoFields) {
+        const temp_info = generateFetchOptions(inputId, hasTwoFields);
+        const input = temp_info[0];
+        const options = temp_info[1];
+
+        const searchParam = convertJsonToQuery(input)
+        // console.log(searchParam);
+        const url = new URL('http://localhost:5000/cves?' + searchParam);
+        console.log(url);
+        fetch(url, options).then(data => data.json()).then(result => {
+          const htmlString = '<html><body>' + JSON.stringify(result, undefined, 1) + '</body></html>';
+          let displayFrame = document.getElementById('displayFrame');
+          displayFrame.src = "javascript:'"+htmlString+"'";
+          resizeIFrame(displayFrame);
+        }).catch(console.error());
+      }
+
+    function generateFetchOptions(inputType, hasTwoFields){
+      const userToken = document.getElementById('tokenContainer').value;
+      const userData = {
+          'userToken' : userToken
+        };
+      if (hasTwoFields === false) {
+        const userInput = document.getElementById(inputType).value;
+        const input = {
+          [inputType] : userInput
+        };
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(userData)
+        };  
+        return [input, options];
+      } else {
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(userData)
+        };
+        if (inputType === 'spl1spl2') {
+          const input = {
+            'spl1' : document.getElementById('spl1').value,
+            'spl2' : document.getElementById('spl2').value
+          };
+          console.log('input: ' + JSON.stringify(input));
+          return [input, options];
+        }
+      }
+    }
+
+    function convertJsonToQuery(jsonObject) {
+      let result = '';
+      let iter = 0;
+      for (key of Object.keys(jsonObject)) {
+        if (iter != 0) { result += '&';}
+        result += key + '=';
+        result += jsonObject[key];
+        iter++;
+      }
+      return result;
+    }
+
+    function sendUserEmail() {
+        firebase.auth().onAuthStateChanged(function(user) {
+            const email = user.email;
+            const data = {
+                'email' : email
+            };
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            };
+            console.log('sent user email');
+            fetch('/data', options);
+        });
+      }
+  </script>
 </html>
