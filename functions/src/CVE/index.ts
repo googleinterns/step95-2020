@@ -6,13 +6,28 @@ import * as Enumerable from 'linq';
 
 const app = express();
 const main = express();
+const firebase = require('firebase');
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBfQKMxa1azXidOZJjT8UYDm5BnU4s2bKA",
+  authDomain: "step95-2020.firebaseapp.com",
+  databaseURL: "https://step95-2020.firebaseio.com",
+  projectId: "step95-2020",
+  storageBucket: "step95-2020.appspot.com",
+  messagingSenderId: "525367632678",
+  appId: "1:525367632678:web:476053e80e5f22c6f417e7",
+  measurementId: "G-QJE1CBXKGN"
+};
+firebase.initializeApp(firebaseConfig);
 
 main.use(app);
 main.use(bodyParser.json());
 
 export const getCVE = functions.https.onRequest(main);
 
-app.get('/cves', (request, response) => {
+app.post('/cves', (request, response) => {
+  const userToken: string = request.body['userToken'];
+  if(typeof(userToken) !== 'undefined' && userToken !== ''){
     const bulletinID = request.query.bulletinid;
     const splID = request.query.splid;
     const splStart = request.query.splstart;
@@ -21,24 +36,34 @@ app.get('/cves', (request, response) => {
     const spl2 = request.query.spl2;  
     const androidVersion = request.query.androidVersion;
 
-    if (bulletinID){
-      getCvesWithBulletinID(String(bulletinID),response);
-    }
-    else if (splID){
-      getCvesWithSplID(String(splID),response);
-    }
-    else if (splStart){
-      splStartHelper(String(splStart), response);
-    } 
-    else if (cveID){
-      getCveWithCveID(String(cveID),response);
-    }
-    else if (spl1 && spl2){
-      getChangesBetweenSPLs(String(spl1),String(spl2),response);
-    }
-    else if (androidVersion){
-      getCvesWithAndroidVersion(String(androidVersion),response);
-    }
+    admin.auth().verifyIdToken(userToken).then((claims) => {
+      if (claims.isAdmin === true) {
+        console.log('User has admin privileges');
+        if (bulletinID){
+          getCvesWithBulletinID(String(bulletinID),response);
+        }
+        else if (splID){
+          getCvesWithSplID(String(splID),response);
+        }
+        else if (splStart){
+          splStartHelper(String(splStart), response);
+        } 
+        else if (cveID){
+          getCveWithCveID(String(cveID),response);
+        }
+        else if (spl1 && spl2){
+          getChangesBetweenSPLs(String(spl1),String(spl2),response);
+        }
+        else if (androidVersion){
+          getCvesWithAndroidVersion(String(androidVersion),response);
+        }
+      } else {
+        response.send('User does not have admin privileges');
+      }
+    }).catch((error: any) => {
+      response.status(400).send("Error validating user's token:" + error);
+    });
+  }
 });
 
 function getCvesWithBulletinID(id:string,res:any){
@@ -73,15 +98,15 @@ function getCvesWithSplID(id:string,res:any){
   });
 }
 
-function splStartHelper(id : string, res : any) : void {
-  var db = admin.database();
-  var ref = db.ref('/CVEs');
-
+function splStartHelper(id : string, res : any){
+  const db = admin.database();
+  const ref = db.ref('/CVEs');
+  
   ref.on("value", function(snapshot) {
     let cves = snapshot.val();
     let cve_array : Array<any> = [];
     const cve_jsons : any = Enumerable.from(cves)
-      .where(function(obj) {return obj.value['ASB'] < id})
+      .where(function(obj) {return obj.value['patch_level'] < id})
       .select(function (obj){
         return obj.value;})
     for (const cve of cve_jsons){
@@ -90,6 +115,7 @@ function splStartHelper(id : string, res : any) : void {
     const result = {
       'CVEs' : cve_array
     }
+    console.log(result)
     res.send(result);}, 
       function(error) { console.log(error);});
 }

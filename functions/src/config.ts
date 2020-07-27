@@ -1,4 +1,5 @@
 export const firebaseConfig = {
+    apiKey: "AIzaSyBfQKMxa1azXidOZJjT8UYDm5BnU4s2bKA",
     authDomain: "step95-2020.firebaseapp.com", 
     databaseURL: "https://step95-2020.firebaseio.com", 
     projectId: "step95-2020", 
