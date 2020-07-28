@@ -110,15 +110,14 @@ function splStartHelper(id : string, res : any){
       .where(function(obj) {return obj.value['patch_level'] < id})
       .select(function (obj){
         return obj.value;})
-    for (const cve of cve_jsons){
-      cve_array.push(cve);
-    }
-    const result = {
-      'CVEs' : cve_array
-    }
-    console.log(result)
-    res.send(result);}, 
-      function(error) { console.log(error);});
+  for (const cve of cve_jsons){
+    cve_array.push(cve);
+  }
+  const result = {
+    'CVEs' : cve_array
+  }
+  res.send(result);}, 
+    function(error) { console.log(error);});
 }
 
 function getCveWithCveID(id:any,res:any){
