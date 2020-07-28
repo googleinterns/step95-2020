@@ -12,6 +12,10 @@
     <button id='generateToken'>Get User Token</button>
     <div>
       <div>
+        <label for='gcloudToken'>Enter gcloud token (use $ gcloud auth print-identity-token)</label>
+        <input type='text' id='gcloudToken' name='gcloudToken'/>
+      </div>
+      <div>
         <label for='bulletinid'>Enter bulletinID for CVEs</label>
         <input type='text' id='bulletinid' name='bulletinid'/>
         <button id='bulletinidButton'>Submit</button>
@@ -43,6 +47,29 @@
         <input type='text' id='spl2' name='spl2'/>
         <button id='spl1spl2Button'>Submit</button> 
       </div>
+      <div>
+        <label for='bulletinidSPL'>Enter bulletinid for SPL</label>
+        <input type='text' id='bulletinidSPL' name='bulletinidSPL'/>
+        <button id='bulletinidSPLButton'>Submit</button>
+      </div>
+      <div>
+        <label for='androidVersionSPL'>Enter Android version for SPL</label>
+        <input type='text' id='androidVersionSPL' name='androidVersionSPL'/>
+        <button id='androidVersionSPLButton'>Submit</button>
+      </div>
+      <div>
+        <label for='bulletinidBULLETIN'>Enter bulletin id for SPLs/CVEs</label>
+        <input type='text' id='bulletinidBULLETIN' name='bulletinidBULLETIN'/>
+        <button id='bulletinidBULLETINButton'>Submit</button>
+      </div>
+      <div>
+        <label for='androidVersionBULLETIN'>Enter Android version for SPLs/CVEs</label>
+        <input type='text' id='androidVersionBULLETIN' name='androidVersionBULLETIN'/>
+        <button id='androidVersionBULLETINButton'>Submit</button>
+      </div>
+      <div>
+        <button id='supportedAndroidVersionsButton'>Get Supported Android Versions</button>
+      </div>
     </div>
     <div style='clear: right'>
       <iframe name='displayFrame' id='displayFrame' width='50%' height="100%"></iframe>
@@ -64,42 +91,41 @@
     firebase.initializeApp(firebaseConfig);
     document.getElementById('generateToken').addEventListener("click", generateToken);
     
-    document.getElementById('splStartButton').addEventListener("click", function() { sendRequest('splstart', false);});
-    document.getElementById('bulletinidButton').addEventListener("click", function() { sendRequest('bulletinid', false);});
-    document.getElementById('cveswithsplidButton').addEventListener("click", function() { sendRequest('splid', false);});
-    document.getElementById('cveidButton').addEventListener("click", function() { sendRequest('cveid', false);});
-    document.getElementById('spl1spl2Button').addEventListener("click", function() { sendRequest('spl1spl2', true);});
+    document.getElementById('splStartButton').addEventListener("click", function() { sendRequest('splstart','cves?', false);});
+    document.getElementById('bulletinidButton').addEventListener("click", function() { sendRequest('bulletinid', 'cves?', false);});
+    document.getElementById('cveswithsplidButton').addEventListener("click", function() { sendRequest('splid', 'cves?', false);});
+    document.getElementById('cveidButton').addEventListener("click", function() { sendRequest('cveid', 'cves?', false);});
+    document.getElementById('spl1spl2Button').addEventListener("click", function() { sendRequest('spl1spl2', 'cves?', true);});
+    document.getElementById('bulletinidSPLButton').addEventListener("click", function() { sendRequest('bulletinidSPL', 'spls?', false);});
+    document.getElementById('androidVersionSPLButton').addEventListener("click", function() { sendRequest('androidVersionSPL', 'spls?', false);});
+    document.getElementById('bulletinidBULLETINButton').addEventListener("click", function() { sendRequest('bulletinidBULLETIN', 'bulletins?', false);});
+    document.getElementById('androidVersionBULLETINButton').addEventListener("click", function() { sendRequest('androidVersionBULLETIN', 'bulletins?', false);});
+    document.getElementById('supportedAndroidVersionsButton').addEventListener("click", function() { sendRequest('supportedAndroidVersions', 'supportedAndroidVersions', false);});
 
     function generateToken() {
       firebase.auth().onAuthStateChanged(function(user) {
         if (user){
           firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
             document.getElementById("tokenContainer").innerHTML = idToken;
-            const data = {
-                'userToken' : idToken
-            };
-            const options = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            };
-            fetch('/data', options);
           });
         }
       });
     }
 
-    function sendRequest(inputId, hasTwoFields) {
+    function sendRequest(inputId, route, hasTwoFields) {
         const temp_info = generateFetchOptions(inputId, hasTwoFields);
         const input = temp_info[0];
         const options = temp_info[1];
 
         const searchParam = convertJsonToQuery(input)
-        // console.log(searchParam);
-        const url = new URL('http://localhost:5000/cves?' + searchParam);
-        console.log(url);
+        console.log(location.hostname);
+        if (location.hostname === 'localhost') {
+          urlRoute = 'http://localhost:5000/' + route;
+        } else {
+          urlRoute = 'https://step95-2020.web.app/' + route;
+        }
+
+        const url = new URL(urlRoute + searchParam);
         fetch(url, options).then(data => data.json()).then(result => {
           const htmlString = '<html><body>' + JSON.stringify(result, undefined, 1) + '</body></html>';
           let displayFrame = document.getElementById('displayFrame');
@@ -108,18 +134,21 @@
       }
 
     function generateFetchOptions(inputType, hasTwoFields){
+      const gcloudToken = document.getElementById('gcloudToken').value;
       const userToken = document.getElementById('tokenContainer').value;
       const userData = {
           'userToken' : userToken
         };
-      if (hasTwoFields === false) {
+      let input = {};
+      if (hasTwoFields === false && inputType !== 'supportedAndroidVersions') {
         const userInput = document.getElementById(inputType).value;
-        const input = {
+        input = {
           [inputType] : userInput
         };
         const options = {
           method: 'POST',
           headers: {
+            'Authorization': 'Bearer ' + gcloudToken,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(userData)
@@ -129,18 +158,18 @@
         const options = {
           method: 'POST',
           headers: {
+            'Authorization': 'Bearer ' + gcloudToken,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(userData)
         };
         if (inputType === 'spl1spl2') {
-          const input = {
+          input = {
             'spl1' : document.getElementById('spl1').value,
             'spl2' : document.getElementById('spl2').value
           };
-          console.log('input: ' + JSON.stringify(input));
-          return [input, options];
         }
+        return [input, options];
       }
     }
 

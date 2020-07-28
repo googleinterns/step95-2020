@@ -12,7 +12,7 @@ main.use(bodyParser.json());
 
 export const getAndroidVersion = functions.https.onRequest(main);
 
-app.get('/supportedAndroidVersions', (request,response) => {
+app.post('/supportedAndroidVersions', (request,response) => {
     getSupportedAndroidVersions(response);
 });
 

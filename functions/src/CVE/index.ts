@@ -26,6 +26,7 @@ main.use(bodyParser.json());
 export const getCVE = functions.https.onRequest(main);
 
 app.post('/cves', (request, response) => {
+  console.log('msg send');
   const userToken: string = request.body['userToken'];
   if(typeof(userToken) !== 'undefined' && userToken !== ''){
     const bulletinID = request.query.bulletinid;
@@ -63,7 +64,7 @@ app.post('/cves', (request, response) => {
     }).catch((error: any) => {
       response.status(400).send("Error validating user's token:" + error);
     });
-  }
+  } else {response.status(400).send('Token was not provided');}
 });
 
 function getCvesWithBulletinID(id:string,res:any){

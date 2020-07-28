@@ -26,7 +26,7 @@ export const getAndroidVersionFunction =
 export const getData = functions.https.onRequest(main);
 
 app.post('/data', (request: any, response: any) => {
-  if (request.body['email']) {
+  if (typeof(request.body['email']) !== 'undefined') {
     const email: string = request.body['email'];
     setAdminPriveleges(email).catch(error => {
         response.status(400).send("error giving admin privileges:"+ error);
@@ -36,7 +36,6 @@ app.post('/data', (request: any, response: any) => {
 });
 
 async function setAdminPriveleges(userEmail: string): Promise<void> {
-
   const user = await admin.auth().getUserByEmail(userEmail);
   if (userEmail.split('@')[1] === 'google.com') {
     if (user.customClaims && (user.customClaims as any).isAdmin === true) {
