@@ -123,7 +123,7 @@
    document.getElementById('supportedAndroidVersionsButton')
     .addEventListener("click", function() { sendRequest('supportedAndroidVersions', 'supportedAndroidVersions', false);});
    document.getElementById('v1v2bulletinButton')
-    .addEventListener("click", function() { sendRequest('v1v2bulletin', 'cves?, true');});
+    .addEventListener("click", function() { sendRequest('v1v2bulletin', 'cves?', true);});
 
    function generateToken() {
      firebase.auth().onAuthStateChanged(function(user) {
@@ -141,7 +141,6 @@
        const options = temp_info[1];
  
        const searchParam = convertJsonToQuery(input)
-       console.log(location.hostname);
        if (location.hostname === 'localhost') {
          urlRoute = 'http://localhost:5000/' + route;
        } else {
