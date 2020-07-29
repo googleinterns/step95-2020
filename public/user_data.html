@@ -21,6 +21,16 @@
        <button id='bulletinidButton'>Submit</button>
      </div>
      <div>
+       <label for='v1v2bulletin'>Enter v1, v2 and bulletinid (above)
+         to check version id validity
+       </label>
+       <div id='v1v2bulletin'>
+         <input type='text' id='v1' name='v1'/>
+         <input type='text' id='v2' name='v2'/>
+         <button id='v1v2bulletinButton'>Submit</button>
+       </div>
+     </div>
+     <div>
        <label for='splstart'>Enter splStart for CVEs</label>
        <input type='text' id='splstart' name='splstart'/>
        <button id='splStartButton'>Submit</button>
@@ -89,19 +99,32 @@
        measurementId: "G-QJE1CBXKGN"
    };
    firebase.initializeApp(firebaseConfig);
+   
    document.getElementById('generateToken').addEventListener("click", generateToken);
   
-   document.getElementById('splStartButton').addEventListener("click", function() { sendRequest('splstart','cves?', false);});
-   document.getElementById('bulletinidButton').addEventListener("click", function() { sendRequest('bulletinid', 'cves?', false);});
-   document.getElementById('cveswithsplidButton').addEventListener("click", function() { sendRequest('splid', 'cves?', false);});
-   document.getElementById('cveidButton').addEventListener("click", function() { sendRequest('cveid', 'cves?', false);});
-   document.getElementById('spl1spl2Button').addEventListener("click", function() { sendRequest('spl1spl2', 'cves?', true);});
-   document.getElementById('bulletinidSPLButton').addEventListener("click", function() { sendRequest('bulletinidSPL', 'spls?', false);});
-   document.getElementById('androidVersionSPLButton').addEventListener("click", function() { sendRequest('androidVersionSPL', 'spls?', false);});
-   document.getElementById('bulletinidBULLETINButton').addEventListener("click", function() { sendRequest('bulletinidBULLETIN', 'bulletins?', false);});
-   document.getElementById('androidVersionBULLETINButton').addEventListener("click", function() { sendRequest('androidVersionBULLETIN', 'bulletins?', false);});
-   document.getElementById('supportedAndroidVersionsButton').addEventListener("click", function() { sendRequest('supportedAndroidVersions', 'supportedAndroidVersions', false);});
- 
+   document.getElementById('splStartButton')
+    .addEventListener("click", function() { sendRequest('splstart','cves?', false);});
+   document.getElementById('bulletinidButton')
+    .addEventListener("click", function() { sendRequest('bulletinid', 'cves?', false);});
+   document.getElementById('cveswithsplidButton')
+    .addEventListener("click", function() { sendRequest('splid', 'cves?', false);});
+   document.getElementById('cveidButton')
+    .addEventListener("click", function() { sendRequest('cveid', 'cves?', false);});
+   document.getElementById('spl1spl2Button')
+    .addEventListener("click", function() { sendRequest('spl1spl2', 'cves?', true);});
+   document.getElementById('bulletinidSPLButton')
+      .addEventListener("click", function() { sendRequest('bulletinidSPL', 'spls?', false);});
+   document.getElementById('androidVersionSPLButton')
+    .addEventListener("click", function() { sendRequest('androidVersionSPL', 'spls?', false);});
+   document.getElementById('bulletinidBULLETINButton')
+    .addEventListener("click", function() { sendRequest('bulletinidBULLETIN', 'bulletins?', false);});
+   document.getElementById('androidVersionBULLETINButton')
+    .addEventListener("click", function() { sendRequest('androidVersionBULLETIN', 'bulletins?', false);});
+   document.getElementById('supportedAndroidVersionsButton')
+    .addEventListener("click", function() { sendRequest('supportedAndroidVersions', 'supportedAndroidVersions', false);});
+   document.getElementById('v1v2bulletinButton')
+    .addEventListener("click", function() { sendRequest('v1v2bulletin', 'cves?, true');});
+
    function generateToken() {
      firebase.auth().onAuthStateChanged(function(user) {
        if (user){
@@ -136,9 +159,7 @@
    function generateFetchOptions(inputType, hasTwoFields){
      const gcloudToken = document.getElementById('gcloudToken').value;
      const userToken = document.getElementById('tokenContainer').value;
-     const userData = {
-         'userToken' : userToken
-       };
+     const userData = { 'userToken' : userToken};
      let input = {};
      if (hasTwoFields === false && inputType !== 'supportedAndroidVersions') {
        const userInput = document.getElementById(inputType).value;
@@ -168,6 +189,13 @@
            'spl1' : document.getElementById('spl1').value,
            'spl2' : document.getElementById('spl2').value
          };
+       }
+       else if (inputType === 'v1v2bulletin') {
+          input = {
+            'bulletinid' : document.getElementById('bulletinid').value,
+            'v1' : document.getElementById('v1').value,
+            'v2' : document.getElementById('v2').value
+          };
        }
        return [input, options];
      }
