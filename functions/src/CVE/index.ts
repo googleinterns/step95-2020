@@ -303,4 +303,3 @@ function getCvesWithAndroidVersion(version: string, res: any) {
       res.status(500).send("error getting CVEs for AndroidVersion: " + error)
     });
 }
-
