@@ -1,18 +1,8 @@
 import * as functions from 'firebase-functions';
-import * as express from 'express';
-import * as bodyParser from "body-parser";
 import * as admin from 'firebase-admin';
 import * as checks from '../errorChecks';
 
-const app = express();
-const main = express();
-
-main.use(app);
-main.use(bodyParser.json());
-
-export const getSPL = functions.https.onRequest(main);
-
-app.get('/spls', (request, response) => {
+export const getSPL = functions.https.onRequest((request, response) => {
 
   const bulletinID = request.query.bulletinid;
   const androidVersion = request.query.androidVersion;
