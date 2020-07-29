@@ -23,25 +23,28 @@ export const getBulletinFunction = bulletinFunction.getBulletin;
 export const getAndroidVersionFunction =
   androidVersionFunction.getAndroidVersion;
 
-export const getData = functions.https.onRequest(main);
+export const grantAdminRole = functions.https.onRequest(main);
 
-app.post('/data', (request: any, response: any) => {
-  if (request.body['email']) {
-    const email: string = request.body['email'];
-    setAdminPriveleges(email).catch(error => {
-        response.status(400).send("error giving admin privileges:"+ error);
-      }
+app.post('/grantAdminRole', (request: any, response: any) => {
+  if (request.body['userToken']) {
+    admin.auth().verifyIdToken(request.body['userToken'])
+      .then(function(decodedToken) {
+        const email: any = decodedToken.email;
+        setAdminPriveleges(email).catch(error => {
+            response.status(400).send("Error giving admin privileges:"+ error);
+        })
+      }).catch(error => {response.status(400).send("Error verifiying token:" + error);}
     )
   }
 });
 
 async function setAdminPriveleges(userEmail: string): Promise<void> {
-
   const user = await admin.auth().getUserByEmail(userEmail);
   if (userEmail.split('@')[1] === 'google.com') {
     if (user.customClaims && (user.customClaims as any).isAdmin === true) {
       return;
     }
+    console.log('User has been granted admin');
     return admin.auth().setCustomUserClaims(user.uid, {
       isAdmin: true,
       isPartner: false,

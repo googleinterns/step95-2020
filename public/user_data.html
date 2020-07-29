@@ -4,10 +4,17 @@
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <title>Logged In</title>
- <div id="tokenContainer"></div>
+ <textarea id='tokenContainer'></textarea>
 </head>
-<body onload="sendUserEmail()">
- <button id='generateToken'>Get User Token</button>
+<body>
+ <div>
+  <div>
+    <label for='gcloudToken'>Enter gcloud token (use $ gcloud auth print-identity-token)</label>
+    <input type='text' id='gcloudToken' name='gcloudToken'/>
+  </div>
+  </div>
+  <button id='generateToken'>Get User Token</button>
+  <button id='getAdminPrivileges'>Get Admin Privileges</button>
 </body>
 <script src="https://www.gstatic.com/firebasejs/7.4.0/firebase.js"></script>
 <script type="text/javascript">
@@ -22,45 +29,37 @@
     measurementId: "G-QJE1CBXKGN"
  };
  firebase.initializeApp(firebaseConfig);
+
  document.getElementById('generateToken').addEventListener("click", generateToken);
- 
+ document.getElementById('getAdminPrivileges').addEventListener("click", sendUserEmail);
 
 function generateToken() {
   firebase.auth().onAuthStateChanged(function(user) {
     if (user){
       firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
         document.getElementById("tokenContainer").innerHTML = idToken;
-        const data = {
-            'userToken' : idToken
-        };
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        };
-        fetch('/data', options);
       });
     }
   });
 }
 
+ // DO NOT DEPLOY THIS FUNCTION TO PRODUCTION!
  function sendUserEmail() {
     firebase.auth().onAuthStateChanged(function(user) {
-        const email = user.email;
+        const userToken = document.getElementById('tokenContainer').value;
+        const gcloudToken = document.getElementById('gcloudToken').value;
         const data = {
-            'email' : email
+            'userToken' : userToken
         };
         const options = {
             method: 'POST',
             headers: {
+                'Authorization': 'Bearer ' + gcloudToken,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
         };
-        console.log('sent user email');
-        fetch('/data', options);
+        fetch('/grantAdminRole', options);
     });
     }
 </script>
