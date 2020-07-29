@@ -1,19 +1,9 @@
 import * as functions from 'firebase-functions';
-import * as express from 'express';
-import * as bodyParser from 'body-parser';
 import * as admin from 'firebase-admin';
 import * as Enumerable from 'linq';
 
-const app = express();
-const main = express();
-
-main.use(app);
-main.use(bodyParser.json());
-
-export const getAndroidVersion = functions.https.onRequest(main);
-
-app.post('/supportedAndroidVersions', (request, response) => {
-  getSupportedAndroidVersions(response);
+export const getAndroidVersion = functions.https.onRequest((request, response) => {
+    getSupportedAndroidVersions(response);
 });
 
 function getSupportedAndroidVersions(res: any) {

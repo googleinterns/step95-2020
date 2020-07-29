@@ -8,7 +8,7 @@
      <textarea id='tokenContainer'></textarea>
    </div>
  </head>
- <body onload="sendUserEmail()">
+ <body>
    <button id='generateToken'>Get User Token</button>
    <div>
      <div>
@@ -157,31 +157,32 @@
  
    function generateFetchOptions(inputType, hasTwoFields){
      const gcloudToken = document.getElementById('gcloudToken').value;
-     const userToken = document.getElementById('tokenContainer').value;
-     const userData = { 'userToken' : userToken};
+     let userToken = '';
      let input = {};
      if (hasTwoFields === false && inputType !== 'supportedAndroidVersions') {
        const userInput = document.getElementById(inputType).value;
+       userToken = document.getElementById('tokenContainer').value;
        input = {
          [inputType] : userInput
        };
        const options = {
-         method: 'POST',
+         method: 'GET',
          headers: {
            'Authorization': 'Bearer ' + gcloudToken,
+           'userToken' : userToken,
            'Content-Type': 'application/json'
-         },
-         body: JSON.stringify(userData)
+         }
        }; 
        return [input, options];
      } else {
+       userToken = document.getElementById('tokenContainer').value;
        const options = {
-         method: 'POST',
+         method: 'GET',
          headers: {
            'Authorization': 'Bearer ' + gcloudToken,
+           'userToken': userToken,
            'Content-Type': 'application/json'
-         },
-         body: JSON.stringify(userData)
+         }
        };
        if (inputType === 'spl1spl2') {
          input = {
@@ -211,24 +212,6 @@
      }
      return result;
    }
- 
-   function sendUserEmail() {
-       firebase.auth().onAuthStateChanged(function(user) {
-           const email = user.email;
-           const data = {
-               'email' : email
-           };
-           const options = {
-               method: 'POST',
-               headers: {
-                   'Content-Type': 'application/json'
-               },
-               body: JSON.stringify(data)
-           };
-           console.log('sent user email');
-           fetch('/data', options);
-       });
-     }
  </script>
 </html>
  

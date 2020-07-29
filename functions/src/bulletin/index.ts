@@ -1,18 +1,9 @@
 import * as functions from 'firebase-functions';
-import * as express from 'express';
-import * as bodyParser from 'body-parser';
 import * as admin from 'firebase-admin';
 import * as checks from '../errorChecks';
 
-const app = express();
-const main = express();
-
-main.use(app);
-main.use(bodyParser.json());
-
-export const getBulletin = functions.https.onRequest(main);
-
-app.post('/bulletins', (request, response) => {
+export const getBulletin = functions.https.onRequest((request, response) => {
+  
   const bulletinID = request.query.bulletinidBULLETIN;
   const androidVersion = request.query.androidVersionBULLETIN;
 
@@ -27,6 +18,7 @@ app.post('/bulletins', (request, response) => {
     }
     getSplsCvesWithAndroidVersion(String(androidVersion), response);
   }
+
 });
 
 function getSplsCvesWithBulletinID(id: string, res: any) {

@@ -1,20 +1,10 @@
 import * as functions from 'firebase-functions';
-import * as express from 'express';
-import * as bodyParser from 'body-parser';
 import * as admin from 'firebase-admin';
 import * as Enumerable from 'linq';
 import deepEqual = require('deep-equal');
 import * as checks from '../errorChecks';
 
-const app = express();
-const main = express();
-
-main.use(app);
-main.use(bodyParser.json());
-
-export const getCVE = functions.https.onRequest(main);
-
-app.post('/cves', (request, response) => {
+export const getCVE = functions.https.onRequest((request, response) => {
   const bulletinID = request.query.bulletinid;
   const splID = request.query.splid;
   const splStart = request.query.splstart;
@@ -27,50 +17,46 @@ app.post('/cves', (request, response) => {
 
   if (bulletinID) {
     if (!checks.checkBulletinIDValidity(bulletinID)) {
-      response.status(400).send('Error: Bulletin ID is malformed.');
-    }
-    if (v1 && v2) {
-      if (
-        !checks.checkVersionIDValidity(v1) ||
-        !checks.checkVersionIDValidity(v2)
-      ) {
-        response.status(400).send('Error: Version ID is malformed.');
+      response.status(400).send("Error: Bulletin ID is malformed.");
+    } if (v1 && v2) {
+      if (!checks.checkVersionIDValidity(v1) || !checks.checkVersionIDValidity(v2)) {
+        response.status(400).send("Error: Version ID is malformed.");
       }
-      version1And2VulDifference(
-        String(bulletinID),
-        String(v1),
-        String(v2),
-        response
-      );
+      version1And2VulDifference(String(bulletinID), String(v1), String(v2), response);
     }
     getCvesWithBulletinID(String(bulletinID), response);
-  } else if (splID) {
+  }
+  else if (splID) {
     if (!checks.checkSPLValidity(splID)) {
-      response.status(400).send('Error: SPL ID is malformed.');
+      response.status(400).send("Error: SPL ID is malformed.");
     }
     getCvesWithSplID(String(splID), response);
-  } else if (splStart) {
+  }
+  else if (splStart) {
     if (!checks.checkSPLValidity(splStart)) {
-      response.status(400).send('Error: SPL ID is malformed.');
+      response.status(400).send("Error: SPL ID is malformed.");
     }
     getCVEsBeforeSPL(String(splStart), response);
-  } else if (cveID) {
+  }
+  else if (cveID) {
     if (!checks.checkCVEValidity(cveID)) {
-      response.status(400).send('Error: CVE ID is malformed.');
+      response.status(400).send("Error: CVE ID is malformed.");
     }
     getCveWithCveID(String(cveID), response);
-  } else if (spl1 && spl2) {
+  }
+  else if (spl1 && spl2) {
     if (!checks.checkSPLValidity(spl1) || !checks.checkSPLValidity(spl2)) {
-      response.status(400).send('Error: SPL ID is malformed.');
+      response.status(400).send("Error: SPL ID is malformed.");
     }
     getChangesBetweenSPLs(String(spl1), String(spl2), response);
-  } else if (androidVersion) {
+  }
+  else if (androidVersion) {
     if (!checks.checkAndroidVersionValidity(androidVersion)) {
-      response.status(400).send('Error: Android Version ID is malformed.');
+      response.status(400).send("Error: Android Version ID is malformed.");
     }
     getCvesWithAndroidVersion(String(androidVersion), response);
   }
-});
+})
 
 function getCvesWithBulletinID(id: string, res: any) {
   const db = admin.database();
@@ -131,40 +117,29 @@ function getCvesWithSplID(id: string, res: any) {
 }
 
 function getCVEsBeforeSPL(id: string, res: any): void {
-  const db = admin.database();
-  const ref = db.ref('/CVEs');
+  var db = admin.database();
+  var ref = db.ref('/CVEs');
 
-  ref.on(
-    'value',
-    snapshot => {
-      const cves = snapshot.val();
-      const cve_array: Array<any> = [];
-      const cve_jsons: any = Enumerable.from(cves)
-        .where(obj => {
-          return obj.value.patch_level < id;
-        })
-        .select(obj => {
-          return obj.value;
-        });
-      for (const cve of cve_jsons) {
-        cve_array.push(cve);
-      }
-      const result = {
-        CVEs: cve_array,
-      };
-      if (cve_array.length === 0) {
-        res
-          .status(404)
-          .send(
-            'Error: There are no CVEs associated with this SPL start ID in the database.'
-          );
-      }
-      res.send(result);
-    },
-    error => {
-      res.status(500).send('Error getting cves with starting spl' + error);
+  ref.on("value", function (snapshot) {
+    let cves = snapshot.val();
+    let cve_array: Array<any> = [];
+    const cve_jsons: any = Enumerable.from(cves)
+      .where(function (obj) { return obj.value.patch_level < id })
+      .select(function (obj) {
+        return obj.value;
+      })
+    for (const cve of cve_jsons) {
+      cve_array.push(cve);
     }
-  );
+    const result = {
+      'CVEs': cve_array
+    }
+    if (cve_array.length === 0) {
+      res.status(404).send("Error: There are no CVEs associated with this SPL start ID in the database.");
+    }
+    res.send(result);
+  },
+    function (error) { res.status(500).send("Error getting cves with starting spl" + error); });
 }
 
 function version1And2VulDifference(
@@ -378,16 +353,14 @@ function getCvesWithAndroidVersion(version: string, res: any) {
       promises.push(cvePromise);
     }
     return Promise.all(promises);
-  });
-
-  allCvePromise
-    .then(cves => {
-      const cveList = [];
-      for (const cve of cves) {
-        cveList.push(cve.val());
-      }
-      res.send(JSON.stringify(cveList));
-    })
+  })
+  allCvePromise.then((cves) => {
+    const cveList = [];
+    for (const cve of cves) {
+      cveList.push(cve.val());
+    }
+    res.send(JSON.stringify(cveList));
+  })
     .catch(error => {
       res.status(500).send('error getting CVEs for AndroidVersion: ' + error);
     });
