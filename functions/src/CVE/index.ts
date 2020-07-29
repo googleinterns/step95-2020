@@ -3,22 +3,12 @@ import * as express from 'express';
 import * as bodyParser from "body-parser";
 import * as admin from 'firebase-admin';
 import * as Enumerable from 'linq';
+import * as config from '../config';
 
 const app = express();
 const main = express();
-const firebase = require('firebase');
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBfQKMxa1azXidOZJjT8UYDm5BnU4s2bKA",
-  authDomain: "step95-2020.firebaseapp.com",
-  databaseURL: "https://step95-2020.firebaseio.com",
-  projectId: "step95-2020",
-  storageBucket: "step95-2020.appspot.com",
-  messagingSenderId: "525367632678",
-  appId: "1:525367632678:web:476053e80e5f22c6f417e7",
-  measurementId: "G-QJE1CBXKGN"
-};
-firebase.initializeApp(firebaseConfig);
+admin.initializeApp(config.firebaseConfig);
 
 main.use(app);
 main.use(bodyParser.json());
@@ -26,8 +16,6 @@ main.use(bodyParser.json());
 export const getCVE = functions.https.onRequest(main);
 
 app.post('/cves', (request, response) => {
-  const userToken: string = request.body['userToken'];
-  if(typeof(userToken) !== 'undefined' && userToken !== ''){
     const bulletinID = request.query.bulletinid;
     const splID = request.query.splid;
     const splStart = request.query.splstart;
@@ -36,9 +24,6 @@ app.post('/cves', (request, response) => {
     const spl2 = request.query.spl2;  
     const androidVersion = request.query.androidVersion;
 
-    admin.auth().verifyIdToken(userToken).then((claims) => {
-      if (claims.isAdmin === true) {
-        console.log('User has admin privileges');
         if (bulletinID){
           getCvesWithBulletinID(String(bulletinID),response);
         }
@@ -57,14 +42,7 @@ app.post('/cves', (request, response) => {
         else if (androidVersion){
           getCvesWithAndroidVersion(String(androidVersion),response);
         }
-      } else {
-        response.send('User does not have admin privileges');
-      }
-    }).catch((error: any) => {
-      response.status(400).send("Error validating user's token:" + error);
     });
-  }
-});
 
 function getCvesWithBulletinID(id:string,res:any){
   const db = admin.database();

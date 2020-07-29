@@ -3,7 +3,6 @@ import * as express from 'express';
 import * as bodyParser from "body-parser";
 import * as config from './config';
 
-// Initialize Firebase
 admin.initializeApp(config.firebaseConfig);
 
 import * as CVEFunction from './CVE/index';

@@ -11,10 +11,9 @@ main.use(bodyParser.json());
 
 export const getSPL = functions.https.onRequest(main);
 
-app.get('/spls', (request, response) => {
-
-    const bulletinID = request.query.bulletinid;
-    const androidVersion = request.query.androidVersion;
+app.post('/spls', (request, response) => {
+    const bulletinID = request.query.bulletinidSPL;
+    const androidVersion = request.query.androidVersionSPL;
 
     if (bulletinID){
       getSplsWithBulletinID(String(bulletinID),response);
@@ -22,7 +21,6 @@ app.get('/spls', (request, response) => {
     else if (androidVersion){
       getSplsWithAndroidVersion(String(androidVersion),response);
     }
-
 });
 
 function getSplsWithBulletinID(id:string, res:any){;
