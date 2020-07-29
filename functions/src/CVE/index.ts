@@ -1,20 +1,11 @@
 import * as functions from 'firebase-functions';
-import * as express from 'express';
-import * as bodyParser from "body-parser";
 import * as admin from 'firebase-admin';
 import * as Enumerable from 'linq';
 import deepEqual = require('deep-equal');
 import * as checks from '../errorChecks';
 
-const app = express();
-const main = express();
+export const getCVE = functions.https.onRequest((request, response) => {
 
-main.use(app);
-main.use(bodyParser.json());
-
-export const getCVE = functions.https.onRequest(main);
-
-app.get('/cves', (request, response) => {
   const bulletinID = request.query.bulletinid;
   const splID = request.query.splid;
   const splStart = request.query.splstart;
