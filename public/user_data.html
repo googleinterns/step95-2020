@@ -6,7 +6,7 @@
  <title>Logged In</title>
  <div id="tokenContainer"></div>
 </head>
-<body>
+<body onload="sendUserEmail()">
  <button id='generateToken'>Get User Token</button>
 </body>
 <script src="https://www.gstatic.com/firebasejs/7.4.0/firebase.js"></script>
@@ -17,14 +17,44 @@
  firebase.initializeApp(firebaseConfig);
  document.getElementById('generateToken').addEventListener("click", generateToken);
  
+
 function generateToken() {
   firebase.auth().onAuthStateChanged(function(user) {
     if (user){
       firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
         document.getElementById("tokenContainer").innerHTML = idToken;
+        const data = {
+            'userToken' : idToken
+        };
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        fetch('/data', options);
       });
     }
   });
 }
+
+ function sendUserEmail() {
+    firebase.auth().onAuthStateChanged(function(user) {
+        const email = user.email;
+        const data = {
+            'email' : email
+        };
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        console.log('sent user email');
+        fetch('/data', options);
+    });
+    }
 </script>
 </html>
