@@ -24,8 +24,6 @@
     "@siderite/linqer": "^1.2.2",
     "@types/deep-equal": "^1.0.1",
     "@sendgrid/mail": "^7.2.1",
-    "@siderite/linqer": "^1.2.2",
-    "@types/deep-equal": "^1.0.1",
     "@types/yargs": "^15.0.5",
     "body-parser": "^1.19.0",
     "deep-equal": "^2.0.3",
