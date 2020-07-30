@@ -48,19 +48,16 @@ function generateToken() {
     firebase.auth().onAuthStateChanged(function(user) {
         const userToken = document.getElementById('tokenContainer').value;
         const gcloudToken = document.getElementById('gcloudToken').value;
-        const data = {
-            'userToken' : userToken
-        };
         const options = {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + gcloudToken,
+                'userToken' : userToken,
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+            }
         };
         fetch('/grantAdminRole', options);
     });
-    }
+  }
 </script>
 </html>
