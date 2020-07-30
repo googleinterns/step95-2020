@@ -245,11 +245,13 @@ function getCveWithCveID(id: any, res: any) {
     if (cveData === null || cveData === undefined) {
       throw new NotFoundError('CVE ID is not present in the database');
     }
-    else{
-      res.send(cveData[id]);
-    }
+    res.send(cveData[id]);
   }).catch(error => {
-    res.status(500).send('error getting details for CVEID:' + error);
+    if(error instanceof NotFoundError){
+      res.status(404).send(error.message);
+    }else{
+      res.status(500).send('error getting details for CVEID:' + error);
+    }
   });
 }
 
