@@ -43,6 +43,10 @@
     {
       "source": "/data",
       "function": "getData"
+    },
+    {
+      "source":"/upload",
+      "function":"getUploadFunction"
     }
     ]
   },
