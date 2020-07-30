@@ -41,6 +41,8 @@
       "function": "getAndroidVersionFunction"
     },
     {
+      "source": "/grantAdminRole",
+      "function": "grantAdminRole"
       "source": "/data",
       "function": "getData"
     },

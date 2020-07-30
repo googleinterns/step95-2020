@@ -215,7 +215,6 @@ function intersectionBetweenSets(setA: any, setB: any): Set<any> {
     }
   }
   return intersection;
-
 }
 
 function getCveWithCveID(id: any, res: any) {
