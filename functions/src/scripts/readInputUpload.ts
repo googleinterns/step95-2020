@@ -1,18 +1,18 @@
 
-export function getConvertedInputFile(filePath: undefined): any {
+export function getConvertedInputFile(filePath: string): any {
     const rawBulletin = readInputFile(filePath); //read bulletin json file
     const bulletinJSON = JSON.parse(rawBulletin); //parse file into json
     return bulletinJSON;
 }
 
-export function readInputFile(filePath: undefined): any {
+export function readInputFile(filePath: string): any {
      const fs = require('fs');
      const rawJSON = fs.readFileSync(filePath);
      return rawJSON; 
 }
 
 export function getVersion(filepath: any): any {
-   let string = filepath.substring(15);
+   const string = filepath.substring(15);
    const splitString = string.split('-');
     let version = null;
     if (splitString.length === 6) { //assuming format of json file name is <year>-<month>-partner-bulletin-preview<-version>.json

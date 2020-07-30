@@ -145,7 +145,7 @@ export async function convert(bulletinData: any, versionInput: any) {
         const longVersionNumberHistory = currentASB + ":" + versionHistory;
         const db = admin.database();
         const ref = db.ref('/CVE_History');
-        let promises: any[] = [];
+        const promises: any[] = [];
         if (tree === null) {
             //if no data present in history tree, send reconfigured cve tree
             for (const ID in cveTree) {
@@ -247,7 +247,7 @@ export async function convert(bulletinData: any, versionInput: any) {
         const db = admin.database();
         const refCVE = db.ref('/CVEs');
         let result = null;
-        let promises: any[] = [];
+        const promises: any[] = [];
         return refCVE.once('value').then(function (snapshot) {
             result = snapshot.toJSON();
             const bulletinSPLTree = buildBulletinSPLTree(result);
@@ -299,7 +299,7 @@ export async function convert(bulletinData: any, versionInput: any) {
         const db = admin.database();
         const refBulletinSPL = db.ref('/Bulletin_SPL');
         console.log("writing bulletin spl tree to db");
-        let promises: any[] = [];
+        const promises: any[] = [];
         for (const key of treeToSend.keys()) {
             const set = treeToSend.get(key);
             let array = null;
@@ -344,7 +344,7 @@ export async function convert(bulletinData: any, versionInput: any) {
         console.log("sending spl tree to db");
         const db = admin.database();
         const ref = db.ref('/SPL_CVE_IDs');
-        let promises: any[] = [];
+        const promises: any[] = [];
         for (const key of treeToSend.keys()) {
             const set = treeToSend.get(key);
             const publishDate = publishMap.get(key);
@@ -404,7 +404,7 @@ export async function convert(bulletinData: any, versionInput: any) {
         console.log("sending aosp version asb cve tree to db");
         const db = admin.database();
         const ref = db.ref('/AOSP_Version_ASB_CVE_IDs');
-        let promises: any[] = [];
+        const promises: any[] = [];
         for (const key of aospASBMapSend.keys()) {
             const asbCVEIDSet = aospASBMapSend.get(key);
             if (asbCVEIDSet) {
@@ -469,7 +469,7 @@ export async function convert(bulletinData: any, versionInput: any) {
         console.log("sending aosp version cve id tree to db");
         const db = admin.database();
         const ref = db.ref('/AOSP_Version_CVE_IDs');
-        let promises: any[] = [];
+        const promises: any[] = [];
         for (const key of treeToSend.keys()) {
             const set = treeToSend.get(key);
             let array = null;
@@ -512,7 +512,7 @@ export async function convert(bulletinData: any, versionInput: any) {
         console.log("sending bulletin version tree to db");
         const db = admin.database();
         const ref = db.ref('/Bulletin_Version');
-        let promises: any[] = [];
+        const promises: any[] = [];
         for (const key of treeToSend.keys()) {
             const addData: Record<string, string> = {};
             const array = treeToSend.get(key);
