@@ -9,18 +9,18 @@ export const getSPL = functions.https.onRequest((request, response) => {
 
   if (bulletinID) {
     if (!checks.checkBulletinIDValidity(bulletinID)) {
-      response.status(400).send("Error: Bulletin ID is malformed.");
+      response.status(400).send('Bulletin ID is malformed.');
     }
     getSplsWithBulletinID(String(bulletinID), response);
   }
   else if (androidVersion) {
     if (!checks.checkAndroidVersionValidity(androidVersion)) {
-      response.status(400).send("Error: Android Version ID is malformed.");
+      response.status(400).send('Android Version ID is malformed.');
     }
     getSplsWithAndroidVersion(String(androidVersion), response);
   }
   else{
-    response.status(400).send("Error: A query parameter is required.");
+    response.status(400).send('No valid parameters specified. Please specify a bulletin id/android version.');
   }
 
 });
@@ -32,12 +32,16 @@ function getSplsWithBulletinID(id: string, res: any) {
   ref.orderByKey().equalTo(id).once('value', function (snapshot) {
     splData = snapshot.val();
     if (splData === null || splData === undefined) {
-      res.status(404).send("Error: There is no SPL data associated with this bulletin in the database.");
+      throw new NotFoundError('There is no SPL data associated with this bulletin in the database.');
     }
     const splOutput = { Spls: splData[id] }
     res.send(splOutput);
   }).catch(error => {
-    res.status(500).send("error getting spls for bulletinID: " + error)
+    if(error instanceof NotFoundError){
+      res.status(404).send(error.message);
+    }else{
+      res.status(500).send('error getting SPLs for bulletinID:' + error);
+    }
   });
 }
 
@@ -45,11 +49,11 @@ function getSplsWithAndroidVersion(version: string, res: any) {
   const db = admin.database();
   const ref = db.ref('/AOSP_Version_ASB_CVE_IDs');
   let bulletinData: any;
-  const aospVerToBulletinPromise = ref.orderByKey().equalTo(version).once('value')
+  const aospVerToBulletinPromise = ref.orderByKey().equalTo(version).once('value');
   const bulletinSplPromise = aospVerToBulletinPromise.then((snapshot) => {
     bulletinData = snapshot.val();
     if (bulletinData === null || bulletinData === undefined) {
-      res.status(404).send("Error: There are no SPLs associated with this Android Version ID in the database.");
+      throw new NotFoundError('There are no SPLs associated with this Android Version ID in the database.');
     }
     const promises = [];
     for (const bulletinID of Object.keys(bulletinData[version])) {
@@ -71,8 +75,12 @@ function getSplsWithAndroidVersion(version: string, res: any) {
     const splOutput = { Spls: splArray };
     res.send(splOutput);
   }).catch(error => {
-    res.status(500).send("error getting spls for AndroidVersion: " + error)
+    if(error instanceof NotFoundError){
+      res.status(404).send(error.message);
+    }else{
+      res.status(500).send('error getting SPLs for AndroidVersion: ' + error);
+    }
   });
 }
 
-
+class NotFoundError extends Error {}

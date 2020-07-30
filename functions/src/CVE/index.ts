@@ -18,10 +18,10 @@ export const getCVE = functions.https.onRequest((request, response) => {
 
   if (bulletinID) {
     if (!checks.checkBulletinIDValidity(bulletinID)) {
-      response.status(400).send("Error: Bulletin ID is malformed.");
+      response.status(400).send('Bulletin ID is malformed.');
     } if (v1 && v2) {
       if (!checks.checkVersionIDValidity(v1) || !checks.checkVersionIDValidity(v2)) {
-        response.status(400).send("Error: Version ID is malformed.");
+        response.status(400).send('Version ID is malformed.');
       }
       version1And2VulDifference(String(bulletinID), String(v1), String(v2), response);
     }
@@ -29,39 +29,39 @@ export const getCVE = functions.https.onRequest((request, response) => {
   }
   else if (splID) {
     if (!checks.checkSPLValidity(splID)) {
-      response.status(400).send("Error: SPL ID is malformed.");
+      response.status(400).send('SPL ID is malformed.');
     }
     getCvesWithSplID(String(splID), response);
   }
   else if (splStart) {
     if (!checks.checkSPLValidity(splStart)) {
-      response.status(400).send("Error: SPL ID is malformed.");
+      response.status(400).send('SPL ID is malformed.');
     }
     getCVEsBeforeSPL(String(splStart), response);
 
   }
   else if (cveID) {
     if (!checks.checkCVEValidity(cveID)) {
-      response.status(400).send("Error: CVE ID is malformed.");
+      response.status(400).send('CVE ID is malformed.');
     }
     getCveWithCveID(String(cveID), response);
 
   }
   else if (spl1 && spl2) {
     if (!checks.checkSPLValidity(spl1) || !checks.checkSPLValidity(spl2)) {
-      response.status(400).send("Error: SPL ID is malformed.");
+      response.status(400).send('SPL ID is malformed.');
     }
     getChangesBetweenSPLs(String(spl1), String(spl2), response);
 
   }
   else if (androidVersion) {
     if (!checks.checkAndroidVersionValidity(androidVersion)) {
-      response.status(400).send("Error: Android Version ID is malformed.");
+      response.status(400).send('Android Version ID is malformed.');
     }
     getCvesWithAndroidVersion(String(androidVersion), response);
   }
   else{
-    response.status(400).send("Error: A query parameter is required.");
+    response.status(400).send('No valid parameters specified. Please specify a bulletin/spl/cve/android version.');
   }
 });
 
@@ -76,11 +76,15 @@ function getCvesWithBulletinID(id: string, res: any) {
       .toArray();
     const result = { 'CVEs': cves };
     if (cves.length === 0) {
-      res.status(404).send("Error: There are no CVEs associated with this bulletin ID in the database.");
+      throw new NotFoundError('There are no CVEs associated with this bulletin ID in the database.');
     }
     res.send(result);
   }).catch(error => {
-    res.status(500).send("error getting CVEs for bulletinID:" + error);
+    if(error instanceof NotFoundError){
+      res.status(404).send(error.message);
+    }else{
+      res.status(500).send('error getting CVEs for bulletinID:' + error);
+    }
   });
 }
 
@@ -95,19 +99,23 @@ function getCvesWithSplID(id: string, res: any) {
       .toArray();
     const result = { 'CVEs': cves };
     if (cves.length === 0) {
-      res.status(404).send("Error: There are no CVEs associated with this SPL ID in the database.");
+      throw new NotFoundError('There are no CVEs associated with this SPL ID in the database.');
     }
     res.send(result);
   }).catch(error => {
-    res.status(500).send("error getting CVEs for spl:" + error);
+    if(error instanceof NotFoundError){
+      res.status(404).send(error.message);
+    }else{
+      res.status(500).send('error getting CVEs for SPL:' + error);
+    }
   });
 }
 
-function getCVEsBeforeSPL(id: string, res: any): void {
+function getCVEsBeforeSPL(id: string, res: any){
   var db = admin.database();
   var ref = db.ref('/CVEs');
 
-  ref.on("value", function (snapshot) {
+  ref.once('value', function (snapshot) {
     let cves = snapshot.val();
     let cve_array: Array<any> = [];
     const cve_jsons: any = Enumerable.from(cves)
@@ -122,18 +130,23 @@ function getCVEsBeforeSPL(id: string, res: any): void {
       'CVEs': cve_array
     }
     if (cve_array.length === 0) {
-      res.status(404).send("Error: There are no CVEs associated with this SPL start ID in the database.");
+      throw new NotFoundError('There are no CVEs associated with this SPL ID in the database.');
     }
     res.send(result);
-  },
-    function (error) { res.status(500).send("Error getting cves with starting spl" + error); });
+  }).catch(error => {
+    if(error instanceof NotFoundError){
+      res.status(404).send(error.message);
+    }else{
+      res.status(500).send('error getting CVEs with starting SPL:' + error);
+    }
+  });
 }
 
 function version1And2VulDifference(bulletin: string, version1: string, version2: string, res: any) {
   const db = admin.database();
   const ref = db.ref('/CVE_History');
-  const wholeVersion1 = bulletin + ":" + version1;
-  const wholeVersion2 = bulletin + ":" + version2;
+  const wholeVersion1 = bulletin + ':' + version1;
+  const wholeVersion2 = bulletin + ':' + version2;
   const version1And2Vul = ref.once('value');
   const version1And2FinalSet = version1And2Vul.then((snapshot) => {
     const cves = snapshot.val();
@@ -142,14 +155,14 @@ function version1And2VulDifference(bulletin: string, version1: string, version2:
       .select(function (obj) { return obj.value[wholeVersion1] })
       .toArray();
     if (cves1.length === 0) {
-      res.status(404).send("Error: There are no CVEs associated with this bulletin ID and version in the database.");
+      throw new NotFoundError('There are no CVEs associated with this bulletin ID and version in the database.');
     }
     const cves2 = Enumerable.from(cves)
       .where(function (obj) { return obj.value[wholeVersion2] !== undefined })
       .select(function (obj) { return obj.value[wholeVersion2] })
       .toArray();
     if (cves2.length === 0) {
-      res.status(404).send("Error: There are no CVEs associated with this bulletin ID and version in the database.");
+      throw new NotFoundError('There are no CVEs associated with this bulletin ID and version in the database.');
     }
     const cves1Set = createSet(cves1);
     const cves2Set = createSet(cves2);
@@ -181,9 +194,13 @@ function version1And2VulDifference(bulletin: string, version1: string, version2:
     }
     const result = { 'CVEs': cveList };
     res.send(result);
-  })
-    .catch(error => { res.status(500).send("Error getting cves for bulletin between v1 and v2: " + error) });
-
+  }).catch(error => { 
+    if(error instanceof NotFoundError){
+      res.status(404).send(error.message);
+    }else{
+      res.status(500).send('Error getting CVEs for bulletin between v1 and v2: ' + error);
+    } 
+  });
 }
 
 function createSet(data: any): Set<any> {
@@ -221,14 +238,18 @@ function intersectionBetweenSets(setA: any, setB: any): Set<any> {
 function getCveWithCveID(id: any, res: any) {
   const db = admin.database();
   const ref = db.ref('/CVEs');
-  ref.orderByKey().equalTo(id).once('value', function (snapshot) {
+  
+  const getCVEsPromise = ref.orderByKey().equalTo(id).once('value');
+  getCVEsPromise.then((snapshot) => {
     const cveData = snapshot.val();
     if (cveData === null || cveData === undefined) {
-      res.status(404).send("Error: ID is not present in the database");
+      throw new NotFoundError('CVE ID is not present in the database');
     }
-    res.send(cveData[id]);
+    else{
+      res.send(cveData[id]);
+    }
   }).catch(error => {
-    res.status(500).send("error getting details for CVEID:" + error);
+    res.status(500).send('error getting details for CVEID:' + error);
   });
 }
 
@@ -253,7 +274,7 @@ function getChangesBetweenSPLs(id1: string, id2: string, res: any) {
       .select(function (obj) { return obj.value.CVE_IDs })
       .toArray();
     if (splCves.length === 0) {
-      res.status(404).send("Error: There are no CVEs between these two SPL IDs in the database.");
+      throw new NotFoundError('There are no CVEs between these two SPL IDs in the database.');
     }
     const mergedCvelist = [].concat.apply([], splCves);
     const promises = [];
@@ -271,24 +292,27 @@ function getChangesBetweenSPLs(id1: string, id2: string, res: any) {
     }
     const cvesBetweenSpls = { CVEs: cveList };
     res.send(cvesBetweenSpls);
-  })
-    .catch(error => {
-      res.status(500).send("error getting cves between Spls: " + error)
-    });
+  }).catch(error => {
+    if(error instanceof NotFoundError){
+      res.status(404).send(error.message);
+    }else{
+      res.status(500).send('error getting CVEs between SPLs: ' + error)
+    }
+  });
 }
 
 function getCvesWithAndroidVersion(version: string, res: any) {
   const db = admin.database();
   const ref = db.ref('/AOSP_Version_CVE_IDs');
   let cveData: any;
-  const aospVerToCvePromise = ref.orderByKey().equalTo(version).once('value')
+  const aospVerToCvePromise = ref.orderByKey().equalTo(version).once('value');
   const allCvePromise = aospVerToCvePromise.then((snapshot) => {
     cveData = snapshot.val();
     if (cveData === null || cveData === undefined) {
-      res.status(404).send("Error: There are no CVEs associated with this Android Version in the database.");
+      throw new NotFoundError('There are no CVEs associated with this Android Version in the database.');
     }
     const promises = [];
-    for (const cveID of cveData[version]["CVE_IDs"]) {
+    for (const cveID of cveData[version]['CVE_IDs']) {
       const cvePromise = db.ref('/CVEs').orderByKey().equalTo(cveID).once('value');
       promises.push(cvePromise);
     }
@@ -301,8 +325,13 @@ function getCvesWithAndroidVersion(version: string, res: any) {
       cveList.push(cve.val());
     }
     res.send(JSON.stringify(cveList));
-  })
-    .catch(error => {
-      res.status(500).send("error getting CVEs for AndroidVersion: " + error)
-    });
+  }).catch(error => {
+    if(error instanceof NotFoundError){
+      res.status(404).send(error.message);
+    }else{
+      res.status(500).send('error getting CVEs for AndroidVersion: ' + error);
+    }
+  });
 }
+
+class NotFoundError extends Error {}

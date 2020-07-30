@@ -34,11 +34,17 @@ function getSupportedAndroidVersions(res: any) {
             .select(function (obj) { return obj.Version })
             .toArray();
         if (verEndDateList.length === 0) {
-            res.status(404).send("Error: No supported android versions.");
+            throw new NotFoundError('No supported android versions.');
         }
         const supportedVersion = { supportedVersion: verEndDateList }
         res.send(supportedVersion);
     }).catch(error => {
+        if(error instanceof NotFoundError){
+            res.status(404).send(error.message);
+        }else{
         res.status(500).send("error getting supported Android Versions: " + error);
+        }
     });
 }
+
+class NotFoundError extends Error {}
