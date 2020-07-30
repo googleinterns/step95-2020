@@ -19,11 +19,13 @@ export const getSPL = functions.https.onRequest((request, response) => {
     }
     getSplsWithAndroidVersion(String(androidVersion), response);
   }
+  else{
+    response.status(400).send("Error: A query parameter is required.");
+  }
 
 });
 
 function getSplsWithBulletinID(id: string, res: any) {
-  ;
   const db = admin.database();
   const ref = db.ref('/Bulletin_SPL');
   let splData: any;

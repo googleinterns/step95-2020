@@ -15,11 +15,15 @@
   </div>
   <button id='generateToken'>Get User Token</button>
   <button id='getAdminPrivileges'>Get Admin Privileges</button>
+  <div> 
+    <label for = "userFile">Upload file </label>
+    <input type = "file" id = "userFile" name = "userFile">
+    <button onClick = "store()" id = "userFilebutton">Submit</button>
+  </div>
 </body>
 <script src="https://www.gstatic.com/firebasejs/7.4.0/firebase.js"></script>
 <script type="text/javascript">
  const firebaseConfig = {
-    apiKey: "AIzaSyBfQKMxa1azXidOZJjT8UYDm5BnU4s2bKA",
     authDomain: "step95-2020.firebaseapp.com",
     databaseURL: "https://step95-2020.firebaseio.com",
     projectId: "step95-2020",
@@ -59,5 +63,23 @@ function generateToken() {
         fetch('/grantAdminRole', options);
     });
   }
+  
+  function store(){
+   var storageRef = firebase.storage().ref();
+   var childRef = storageRef.child(document.getElementById('userFile').value);
+
+   storageRef.child(childRef.getDownloadURL().then((result) => {
+    var doc = "<body>File already in storage. </body>";
+    var frame = document.getElementById('displayFrame');
+    frame.src="javascript:'" + doc + "'";
+
+   })
+   .catch((error)=> {
+     childRef.put(document.getElementById('userFile').files[0]);
+     var doc = "<body>Updating data. Check database for completing trees.</body>";
+     var frame = document.getElementById('displayFrame');
+     frame.src="javascript:'" + doc + "'";
+    }));
+}
 </script>
 </html>
