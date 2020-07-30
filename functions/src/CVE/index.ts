@@ -60,10 +60,13 @@ export const getCVE = functions.https.onRequest((request, response) => {
       if (!checks.checkAndroidVersionValidity(androidVersion)) {
         response.status(400).send("Error: Android Version ID is malformed.");
       }
-      getCvesWithAndroidVersion(String(androidVersion), response);
-    }
-  }).catch(error => { console.log(error);});
-});
+      
+    getCvesWithAndroidVersion(String(androidVersion), response);
+  }
+  else{
+    response.status(400).send("Error: A query parameter is required.");
+  }
+}).catch(error => {console.log(error);});
 
 function getCvesWithBulletinID(id: string, res: any) {
   const db = admin.database();
