@@ -44,23 +44,25 @@
         ui.start('#firebaseui-auth-container', uiConfig);
      </script>
   </head>
-  <body>
+  <body id='loginBody'>
 
    
    <div id="loader">Loading...</div>
 
-   <div id='loginBody'>
-      <div class='loginContainer'>
-         <div class='info'>
-            <div class='icon icon-primary'>
-               <i class='material-icons'>account_circle</i>
-            </div>
-            <h4 class='h4'>Login to access ASB API Web Demo</h4>
-            <p>Login with your Google account in order to access the ASB API Web Demo</p>
-            <div id="firebaseui-auth-container"></div>
-         </div>
+   <div class='loginInfo'>
+   <div class='infoContainer'>
+      <div class='icon icon-primary'>
+         <i class='material-icons'>account_circle</i>
+      </div>      
+      <div>
+         <h4 class='h4'>Login to access ASB API Wb Demo</h4>
+         <p>Login with your Google account in order to access the ASB API Web Demo</p>
       </div>
    </div>
+   <div class='loginContainer'>
+      <div id="firebaseui-auth-container"></div>
+   </div>
+ </div>
 
      <script src="material-kit/assets/js/core/jquery.min.js" type="text/javascript"></script>
      <script src="material-kit/assets/js/core/popper.min.js" type="text/javascript"></script>

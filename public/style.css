@@ -1,10 +1,15 @@
-.loginContainer {
-    background: white;
-    border-radius: 5%;
-    display: inline-block;
-    margin: 0 auto;
+.loginInfo {
+    color: white;
+    display: table;
     text-align: center;
-    width: 75%; 
+}
+
+.infoContainer {
+    display: table-cell;
+}
+
+.loginContainer {
+    display: table-cell;
 }
 
 #loginBody {
@@ -69,4 +74,8 @@ html, body {
     display: table-cell;
     vertical-align: middle;
     text-align: center;
+}
+
+#loginBody {
+    background: lightgreen;
 }
