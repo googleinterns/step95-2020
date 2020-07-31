@@ -9,9 +9,15 @@
  </head>
  <body>
 
+  <div class='asbDemoContainer'>
+    <div class='androidTitle'>
+      Android Security Bulletin API Web App
+    </div>
+  </div>
+
   <div id='tokenDisplay'>
     <textarea id='tokenContainer'></textarea>
-    <button type='button' class='btn btn-primary' id='generateToken'>Get User Token</button>
+    <button type='button' class='btn btn-success' id='generateToken'>Get User Token</button>
   </div>
 
   <div class='demoContainer'>
@@ -24,7 +30,7 @@
         <div class='form-group'>
           <label for='bulletinid'>Enter bulletinID for CVEs</label>
           <input type='text' class='form-control' id='bulletinid' name='bulletinid' placeholder='Example: test'/>
-          <button type='button' class='btn btn-primary' id='bulletinidButton'>Submit</button>
+          <button type='button' class='btn btn-success' id='bulletinidButton'>Submit</button>
         </div>
         <div class='form-group'>
           <label for='v1v2bulletin'>Enter v1, v2 and bulletinid (above)
@@ -35,30 +41,30 @@
               <input type='text' class='form-control' id='v1' name='v1' placeholder='Example: test'/>
             </div>
             <div class='form-group'>
-              <input type='text' class='form-control' id='v2' name='v2'/>
+              <input type='text' class='form-control' id='v2' name='v2' placeholder='Example: test'/>
             </div>
-            <button type='button' class='btn btn-primary' id='v1v2bulletinButton' placeholder='Example: test'>Submit</button>
+            <button type='button' class='btn btn-success' id='v1v2bulletinButton' placeholder='Example: test'>Submit</button>
           </div>
         </div>
         <div class='form-group'>
           <label for='splstart'>Enter splStart for CVEs</label>
           <input type='text' class='form-control' id='splstart' name='splstart' placeholder='Example: test'/>
-          <button type='button' class='btn btn-primary' id='splStartButton'>Submit</button>
+          <button type='button' class='btn btn-success' id='splStartButton'>Submit</button>
         </div>
         <div class='form-group'>
           <label for='splid'>Enter SPL for CVEs</label>
           <input type='text' class='form-control' id='splid' name='splid' placeholder="Example: test"/>
-          <button type='button' class='btn btn-primary' id='cveswithsplidButton'>Submit</button>
+          <button type='button' class='btn btn-success' id='cveswithsplidButton'>Submit</button>
         </div>
         <div class='form-group'>
           <label for='cveid'>Enter cveId for a CVE</label>
           <input type='text' class='form-control' id='cveid' name='cveid' placeholder='Example: test'/>
-          <button type='button' class='btn btn-primary' id='cveidButton'>Submit</button>
+          <button type='button' class='btn btn-success' id='cveidButton'>Submit</button>
         </div>
         <div class='form-group'>
           <label for='androidVersion'>Enter Android version for CVEs</label>
           <input type='text' class='form-control' id='androidVersion' name='androidVersion' placeholder='Example: test'/>
-          <button type='button' class='btn btn-primary' id='androidVersionButton'>Submit</button>
+          <button type='button' class='btn btn-success' id='androidVersionButton'>Submit</button>
         </div>
         <div>
           <div class='form-group'>
@@ -68,31 +74,31 @@
           <div class='form-group'>
             <label for='spl2'>Enter spl2</label>
             <input type='text' class='form-control' id='spl2' name='spl2' placeholder="Example: test"/>
-            <button type='button' class='btn btn-primary' id='spl1spl2Button'>Submit</button>
+            <button type='button' class='btn btn-success' id='spl1spl2Button'>Submit</button>
           </div>
         </div>
         <div class='form-group'>
           <label for='bulletinidSPL'>Enter bulletinid for SPL</label>
           <input type='text' class='form-control' id='bulletinidSPL' name='bulletinidSPL' placeholder="Example: test"/>
-          <button type='button' class='btn btn-primary' id='bulletinidSPLButton'>Submit</button>
+          <button type='button' class='btn btn-success' id='bulletinidSPLButton'>Submit</button>
         </div>
         <div class='form-group'>
           <label for='androidVersionSPL'>Enter Android version for SPL</label>
           <input type='text' class='form-control' id='androidVersionSPL' name='androidVersionSPL' placeholder="Example: test"/>
-          <button type='button' class='btn btn-primary' id='androidVersionSPLButton'>Submit</button>
+          <button type='button' class='btn btn-success' id='androidVersionSPLButton'>Submit</button>
         </div>
         <div class='form-group'>
           <label for='bulletinidBULLETIN'>Enter bulletin id for SPLs/CVEs</label>
           <input type='text' class='form-control' id='bulletinidBULLETIN' name='bulletinidBULLETIN' placeholder="Example: test"/>
-          <button type='button' class='btn btn-primary' id='bulletinidBULLETINButton'>Submit</button>
+          <button type='button' class='btn btn-success' id='bulletinidBULLETINButton'>Submit</button>
         </div>
         <div class='form-group'>
           <label for='androidVersionBULLETIN'>Enter Android version for SPLs/CVEs</label>
           <input type='text' class='form-control' id='androidVersionBULLETIN' name='androidVersionBULLETIN' placeholder="Example: test"/>
-          <button type='button' class='btn btn-primary' id='androidVersionBULLETINButton'>Submit</button>
+          <button type='button' class='btn btn-success' id='androidVersionBULLETINButton'>Submit</button>
         </div>    
         <div id='supportedAOSPContainer'>
-          <button type='button' class='btn btn-primary' id='supportedAndroidVersionsButton'>Get Supported Android Versions</button>
+          <button type='button' class='btn btn-success' id='supportedAndroidVersionsButton'>Get Supported Android Versions</button>
         </div>  
       </div>
     </form>
