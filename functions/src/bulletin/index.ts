@@ -3,7 +3,6 @@ import * as admin from 'firebase-admin';
 import * as checks from '../errorChecks';
 
 export const getBulletin = functions.https.onRequest((request, response) => {
-  
   const bulletinID = request.query.bulletinidBULLETIN;
   const androidVersion = request.query.androidVersionBULLETIN;
 
@@ -17,6 +16,9 @@ export const getBulletin = functions.https.onRequest((request, response) => {
       response.status(400).send('Error: Android Version ID is malformed.');
     }
     getSplsCvesWithAndroidVersion(String(androidVersion), response);
+  }
+  else{
+    response.status(400).send("Error: A query parameter is required.");
   }
 
 });
