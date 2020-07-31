@@ -35,7 +35,7 @@
  firebase.initializeApp(firebaseConfig);
 
  document.getElementById('generateToken').addEventListener("click", generateToken);
- document.getElementById('getAdminPrivileges').addEventListener("click", sendUserEmail);
+ document.getElementById('getAdminPrivileges').addEventListener("click", sendUserToken);
 
 function generateToken() {
   firebase.auth().onAuthStateChanged(function(user) {
@@ -48,7 +48,7 @@ function generateToken() {
 }
 
  // DO NOT DEPLOY THIS FUNCTION TO PRODUCTION!
- function sendUserEmail() {
+ function sendUserToken() {
     firebase.auth().onAuthStateChanged(function(user) {
         const userToken = document.getElementById('tokenContainer').value;
         const gcloudToken = document.getElementById('gcloudToken').value;
