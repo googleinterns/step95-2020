@@ -10,14 +10,16 @@ export const getSPL = functions.https.onRequest((request, response) => {
   if (bulletinID) {
     if (!checks.checkBulletinIDValidity(bulletinID)) {
       response.status(400).send('Bulletin ID is malformed.');
+    }else{
+      getSplsWithBulletinID(String(bulletinID), response);
     }
-    getSplsWithBulletinID(String(bulletinID), response);
   }
   else if (androidVersion) {
     if (!checks.checkAndroidVersionValidity(androidVersion)) {
       response.status(400).send('Android Version ID is malformed.');
+    }else{
+      getSplsWithAndroidVersion(String(androidVersion), response);
     }
-    getSplsWithAndroidVersion(String(androidVersion), response);
   }
   else{
     response.status(400).send('No valid parameters specified. Please specify a bulletin id/android version.');
@@ -29,7 +31,8 @@ function getSplsWithBulletinID(id: string, res: any) {
   const db = admin.database();
   const ref = db.ref('/Bulletin_SPL');
   let splData: any;
-  ref.orderByKey().equalTo(id).once('value', function (snapshot) {
+  const splsPromise = ref.orderByKey().equalTo(id).once('value');
+  splsPromise.then((snapshot) => {
     splData = snapshot.val();
     if (splData === null || splData === undefined) {
       throw new NotFoundError('There is no SPL data associated with this bulletin in the database.');

@@ -19,46 +19,52 @@ export const getCVE = functions.https.onRequest((request, response) => {
   if (bulletinID) {
     if (!checks.checkBulletinIDValidity(bulletinID)) {
       response.status(400).send('Bulletin ID is malformed.');
-    } if (v1 && v2) {
-      if (!checks.checkVersionIDValidity(v1) || !checks.checkVersionIDValidity(v2)) {
-        response.status(400).send('Version ID is malformed.');
+    }else{
+      if (v1 && v2) {
+        if (!checks.checkVersionIDValidity(v1) || !checks.checkVersionIDValidity(v2)) {
+          response.status(400).send('Version ID is malformed.');
+        }else{
+          version1And2VulDifference(String(bulletinID), String(v1), String(v2), response);
+        }
+      }else{
+        getCvesWithBulletinID(String(bulletinID), response);
       }
-      version1And2VulDifference(String(bulletinID), String(v1), String(v2), response);
     }
-    getCvesWithBulletinID(String(bulletinID), response);
   }
   else if (splID) {
     if (!checks.checkSPLValidity(splID)) {
       response.status(400).send('SPL ID is malformed.');
+    }else{
+      getCvesWithSplID(String(splID), response);
     }
-    getCvesWithSplID(String(splID), response);
   }
   else if (splStart) {
     if (!checks.checkSPLValidity(splStart)) {
       response.status(400).send('SPL ID is malformed.');
+    }else{
+      getCVEsBeforeSPL(String(splStart), response);
     }
-    getCVEsBeforeSPL(String(splStart), response);
-
   }
   else if (cveID) {
     if (!checks.checkCVEValidity(cveID)) {
       response.status(400).send('CVE ID is malformed.');
+    }else{
+      getCveWithCveID(String(cveID), response);
     }
-    getCveWithCveID(String(cveID), response);
-
   }
   else if (spl1 && spl2) {
     if (!checks.checkSPLValidity(spl1) || !checks.checkSPLValidity(spl2)) {
       response.status(400).send('SPL ID is malformed.');
+    }else{
+      getChangesBetweenSPLs(String(spl1), String(spl2), response);
     }
-    getChangesBetweenSPLs(String(spl1), String(spl2), response);
-
   }
   else if (androidVersion) {
     if (!checks.checkAndroidVersionValidity(androidVersion)) {
       response.status(400).send('Android Version ID is malformed.');
+    }else{
+      getCvesWithAndroidVersion(String(androidVersion), response);
     }
-    getCvesWithAndroidVersion(String(androidVersion), response);
   }
   else{
     response.status(400).send('No valid parameters specified. Please specify a bulletin/spl/cve/android version.');
@@ -68,7 +74,8 @@ export const getCVE = functions.https.onRequest((request, response) => {
 function getCvesWithBulletinID(id: string, res: any) {
   const db = admin.database();
   const ref = db.ref('/CVEs');
-  ref.once('value', function (snapshot) {
+  const getCVEsPromise = ref.once('value');
+  getCVEsPromise.then((snapshot) => {
     let cves = snapshot.val();
     cves = Enumerable.from(cves)
       .where(function (obj) { return obj.value.ASB === id })
@@ -91,7 +98,8 @@ function getCvesWithBulletinID(id: string, res: any) {
 function getCvesWithSplID(id: string, res: any) {
   const db = admin.database();
   const ref = db.ref('/CVEs');
-  ref.once('value', function (snapshot) {
+  const getCVEsPromise = ref.once('value');
+  getCVEsPromise.then((snapshot) => {
     let cves = snapshot.val();
     cves = Enumerable.from(cves)
       .where(function (obj) { return obj.value.patch_level === id })
@@ -114,8 +122,8 @@ function getCvesWithSplID(id: string, res: any) {
 function getCVEsBeforeSPL(id: string, res: any){
   var db = admin.database();
   var ref = db.ref('/CVEs');
-
-  ref.once('value', function (snapshot) {
+  const getCVEsPromise = ref.once('value');
+  getCVEsPromise.then((snapshot) => {
     let cves = snapshot.val();
     let cve_array: Array<any> = [];
     const cve_jsons: any = Enumerable.from(cves)
@@ -166,7 +174,6 @@ function version1And2VulDifference(bulletin: string, version1: string, version2:
     }
     const cves1Set = createSet(cves1);
     const cves2Set = createSet(cves2);
-
     const cvesFinal = symmetricDifferenceBetweenSets(cves1Set, cves2Set);
 
     const overlappingCVEs = intersectionBetweenSets(cves1Set, cves2Set);
@@ -326,7 +333,7 @@ function getCvesWithAndroidVersion(version: string, res: any) {
     for (const cve of cves) {
       cveList.push(cve.val());
     }
-    res.send(JSON.stringify(cveList));
+    res.send({ CVEs: cveList });
   }).catch(error => {
     if(error instanceof NotFoundError){
       res.status(404).send(error.message);

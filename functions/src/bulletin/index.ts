@@ -10,14 +10,16 @@ export const getBulletin = functions.https.onRequest((request, response) => {
   if (bulletinID) {
     if (!checks.checkBulletinIDValidity(bulletinID)) {
       response.status(400).send('Bulletin ID is malformed.');
+    }else{
+      getSplsCvesWithBulletinID(String(bulletinID), response);
     }
-    getSplsCvesWithBulletinID(String(bulletinID), response);
   }
   else if (androidVersion) {
     if (!checks.checkAndroidVersionValidity(androidVersion)) {
       response.status(400).send('Android Version ID is malformed.');
+    }else{
+      getSplsCvesWithAndroidVersion(String(androidVersion), response);
     }
-    getSplsCvesWithAndroidVersion(String(androidVersion), response);
   }
   else{
     response.status(400).send('No valid parameters specified. Please specify a bulletin id/android version.');
@@ -52,12 +54,13 @@ function getSplsCvesWithBulletinID(id: string, res: any) {
       BulletinID: id,
       SplList: splCveIDList
     }
-    res.send(JSON.stringify(output));
+    res.send(output);
   })
     .catch(error => {
       if(error instanceof NotFoundError){
         res.status(404).send(error.message);
       }else{
+        console.log(error);
         res.status(500).send('error getting details for bulletinID: ' + error);
       }
     });
@@ -112,11 +115,12 @@ function getSplsCvesWithAndroidVersion(version: string, res: any) {
       AndroidVersion: version,
       SplList: splCveIDList
     }
-    res.send(JSON.stringify(output));
+    res.send(output);
   }).catch(error => {
     if(error instanceof NotFoundError){
       res.status(404).send(error.message);
     }else{
+      console.log(error);
       res.status(500).send('error getting spls and cveIDs for AndroidVersion: ' + error);
     }
   });
