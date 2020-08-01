@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
  <head>
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
@@ -8,7 +9,6 @@
   <title>ASB API Web Demo</title>
  </head>
  <body>
-
   <div class='asbDemoContainer'>
     <div class='androidTitle'>
       Android Security Bulletin API Web App
@@ -20,6 +20,12 @@
     <button type='button' class='btn btn-success' id='generateToken'>Get User Token</button>
   </div>
 
+  <button id='getAdminPrivileges'>Get Admin Privileges</button>
+  <div> 
+    <label for = "userFile">Upload file </label>
+    <input type = "file" id = "userFile" name = "userFile">
+    <button onClick = "store()" id = "userFilebutton">Submit</button>
+  </div>
   <div class='demoContainer'>
     <form>
       <div>
@@ -134,7 +140,8 @@
    firebase.initializeApp(firebaseConfig);
    
    document.getElementById('generateToken').addEventListener("click", generateToken);
-  
+   document.getElementById('getAdminPrivileges').addEventListener("click", sendUserToken);
+
    document.getElementById('splStartButton')
     .addEventListener("click", function() { sendRequest('splstart','cves?', false);});
    document.getElementById('bulletinidButton')
@@ -168,6 +175,43 @@
      });
    }
  
+   
+
+ // DO NOT DEPLOY THIS FUNCTION TO PRODUCTION!
+ function sendUserToken() {
+    firebase.auth().onAuthStateChanged(function(user) {
+        const userToken = document.getElementById('tokenContainer').value;
+        const gcloudToken = document.getElementById('gcloudToken').value;
+        const options = {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + gcloudToken,
+                'userToken' : userToken,
+                'Content-Type': 'application/json'
+            }
+        };
+        fetch('/grantAdminRole', options);
+    });
+  }
+  
+  function store(){
+   var storageRef = firebase.storage().ref();
+   var childRef = storageRef.child(document.getElementById('userFile').value);
+
+   storageRef.child(childRef.getDownloadURL().then((result) => {
+    var doc = "<body>File already in storage. </body>";
+    var frame = document.getElementById('displayFrame');
+    frame.src="javascript:'" + doc + "'";
+
+   })
+   .catch((error)=> {
+     childRef.put(document.getElementById('userFile').files[0]);
+     var doc = "<body>Updating data. Check database for completing trees.</body>";
+     var frame = document.getElementById('displayFrame');
+     frame.src="javascript:'" + doc + "'";
+    }));
+}
+  
    function sendRequest(inputId, route, hasTwoFields) {
        const temp_info = generateFetchOptions(inputId, hasTwoFields);
        const input = temp_info[0];
@@ -247,6 +291,3 @@
    }
  </script>
 </html>
- 
- 
-
