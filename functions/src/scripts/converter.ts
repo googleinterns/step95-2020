@@ -36,9 +36,6 @@ export async function convert(bulletinData: any, versionInput: any) {
                 continue;
             }
             if (!regex.test(vul.CVE)) {
-                const hyphenCount = vul.CVE.match(/-/g).length;
-                const vulCVEArray = vul.CVE.split("-");
-                if (hyphenCount !== 3) { //allow for CVE-___-___-1
                     const editedID = checkCVEValidity(vul.CVE, regex); //check if CVE is valid but malformed
                     if (editedID.length === 1) { //only one ID 
                         vul.CVE = editedID[0];
@@ -50,14 +47,6 @@ export async function convert(bulletinData: any, versionInput: any) {
                         }
                     }
                     continue;
-                } else if (vulCVEArray[3].length !== 1) { //check if fits -1 and if not check if valid
-                    const editedID = checkCVEValidity(vul.CVE, regex);
-                    if (editedID.length !== 0) {
-                        vul.CVE = editedID[0];
-                        subCVEData[vul.CVE] = buildSubCVEData(vul, versionNumber, data.published);
-                    }
-                    continue;
-                }
             }
 
             subCVEData[vul.CVE] = buildSubCVEData(vul, versionNumber, data.published);

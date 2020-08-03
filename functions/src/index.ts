@@ -11,7 +11,6 @@ import * as adminFunction from './authorization/index';
 import * as notificationFunction from './notification/index'; 
 import * as uploadFunction from './upload/index';
 
-
 export const getCVEFunction = CVEFunction.getCVE;
 export const getSPLFunction = SPLFunction.getSPL;
 export const getBulletinFunction = bulletinFunction.getBulletin;
