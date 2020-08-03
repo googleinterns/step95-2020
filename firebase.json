@@ -42,7 +42,7 @@
     },
     {
       "source": "/grantAdminRole",
-      "function": "grantAdminRole"
+      "function": "grantAdminRoleFunction"
     }
     ]
   },
