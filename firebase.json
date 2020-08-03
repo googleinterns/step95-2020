@@ -43,6 +43,10 @@
     {
       "source": "/grantAdminRole",
       "function": "grantAdminRoleFunction"
+    },
+    {
+      "source":"/upload",
+      "function":"getUploadFunction"
     }
     ]
   },
