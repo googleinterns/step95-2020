@@ -1,62 +1,48 @@
-.loginInfo {
-    color: white;
-    display: table;
-    text-align: center;
-}
-
-.infoContainer {
-    display: table-cell;
-}
-
-.loginContainer {
-    display: table-cell;
-}
-
-#loginBody {
-    width: 100%;
-}
-
-.demoContainer{
-    margin: 0 auto;
-    width: max-content;
-    background: white;
-    padding: 2%;
-    border-radius: 1%;
-}
+/* For 'index.html' */
 
 html, body {
     height: 100%;
 }
 
-#tokenDisplay {
-    margin-top: 4%;
-    margin-bottom: 4%;
+body{
+    width: 100%;
+}
+
+#loginBody {
+    background: rgb(87, 160, 87);
+    display: table;
+    width: 100%;
+}
+
+#loginContainer {
+    color: white;
+    display: table-cell;
     text-align: center;
 }
 
-#tokenContainer {
-    margin-right: auto;
+#infoContainer {
     display: block;
-    margin-left: auto;
-    margin-bottom: 1%;
+    margin-top: 20%;
 }
 
-#supportedAOSPContainer {
-    text-align: center;
+p {
+    font-size: 15px;
 }
 
-#displayFrame {
-    background-color: white;
-    border: solid;
-    border-color: grey;
-    height: 100%;
-    width: 75%;
+h4, .h4 {
+    font-size: 3.125rem;
 }
 
-.outputContainer {
-    margin: 4%;
-    text-align: center;
+#googleContainer {
+    display: block;
+    margin-top: 4%;
 }
+
+.firebaseui-provider-sign-in-footer>.firebaseui-tos {
+    color: white;
+}
+
+/* For user_data.html */
 
 .asbDemoContainer {
     height: 9%;
@@ -76,6 +62,74 @@ html, body {
     text-align: center;
 }
 
-#loginBody {
-    background: rgb(87, 160, 87);
+#tokenDisplay {
+    margin-top: 4%;
+    margin-bottom: 4%;
+    text-align: center;
+}
+
+#tokenContainer {
+    margin-right: auto;
+    display: block;
+    margin-left: auto;
+    margin-bottom: 1%;
+}
+
+.adminContainer {
+    text-align: center;
+}
+
+.uploadContainer {
+    background: white;
+    border-radius: 4%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 4%;
+    margin-bottom: 4%;
+    text-align: center;
+    width: max-content;
+}
+
+.fileUpload {
+    border-radius: 2%;
+    padding: 4%;
+    width: max-content;
+}
+
+.uploadButton {
+    cursor: pointer;
+}
+
+#userFile {
+    display: none;
+}
+
+#fileName {
+    width: max-content;
+    display: inline-block;
+}
+
+.demoContainer{
+    margin: 0 auto;
+    width: max-content;
+    background: white;
+    padding: 2%;
+    border-radius: 1%;
+}
+
+#supportedAOSPContainer {
+    text-align: center;
+}
+
+.outputContainer {
+    margin: 4%;
+    text-align: center;
+}
+
+#displayFrame {
+    background-color: white;
+    border: solid;
+    border-color: grey;
+    height: 100%;
+    width: 75%;
 }

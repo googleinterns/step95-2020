@@ -20,87 +20,99 @@
     <button type='button' class='btn btn-success' id='generateToken'>Get User Token</button>
   </div>
 
-  <button id='getAdminPrivileges'>Get Admin Privileges</button>
-  <div> 
-    <label for = "userFile">Upload file </label>
-    <input type = "file" id = "userFile" name = "userFile">
-    <button onClick = "store()" id = "userFilebutton">Submit</button>
+  <div class='adminContainer'>
+    <button type='button' class='btn btn-success' id='getAdminPrivileges'>Get Admin Privileges</button>
   </div>
+
+  <div class='uploadContainer'>
+    <div class='fileUpload'> 
+      <!-- <label for = "userFile">Upload file </label> -->
+      <label class='uploadButton'>
+        <input type = "file" id = "userFile" name = "userFile">
+        <i class='button-test'></</i> Upload file
+      </label>
+      <div id='fileName'></div>
+      <button onClick = "store()" class='btn btn-success btn-fab btn-fab-lg btn-round' id = "userFilebutton">
+        <i class='material-icons'>cloud_upload</i>
+      </button>
+    </div>
+  </div>
+
   <div class='demoContainer'>
     <form>
       <div>
-        <div class='form-group'>
+        <div class='form-group has-default'>
           <label for='gcloudToken'>Enter gcloud token </label>
           <input type='text' class='form-control' id='gcloudToken' name='gcloudToken' placeholder='Use $gcloud auth print-identity-token'/>
         </div>
-        <div class='form-group'>
+        <div class='form-group has-default'>
           <label for='bulletinid'>Enter bulletinID for CVEs</label>
           <input type='text' class='form-control' id='bulletinid' name='bulletinid' placeholder='Example: 2018-02'/>
           <button type='button' class='btn btn-success' id='bulletinidButton'>Submit</button>
         </div>
-        <div class='form-group'>
+        <div class='form-group has-default'>
           <label for='v1v2bulletin'>Enter version 1, version 2 and bulletinid (above)
             to check version id validity
           </label>
-          <div class='form-group' id='v1v2bulletin'>
-            <div class='form-group'>
+          <div class='form-group has-default' id='v1v2bulletin'>
+            <div class='form-group has-default'>
               <label for='v1'>Enter version 1</label>
               <input type='text' class='form-control' id='v1' name='v1' placeholder='Example: 1'/>
             </div>
-            <div class='form-group'>
+            <div class='form-group has-default'>
               <label for='v2'>Enter version 2</label>
               <input type='text' class='form-control' id='v2' name='v2' placeholder='Example: 1_1'/>
             </div>
             <button type='button' class='btn btn-success' id='v1v2bulletinButton'>Submit</button>
           </div>
         </div>
-        <div class='form-group'>
+        <div class='form-group has-default'>
           <label for='splstart'>Enter splStart for CVEs</label>
           <input type='text' class='form-control' id='splstart' name='splstart' placeholder='Example: 2018-02-01'/>
           <button type='button' class='btn btn-success' id='splStartButton'>Submit</button>
         </div>
-        <div class='form-group'>
+        <div class='form-group has-default'>
           <label for='splid'>Enter SPL for CVEs</label>
           <input type='text' class='form-control' id='splid' name='splid' placeholder="Example: 2018-02-05"/>
           <button type='button' class='btn btn-success' id='cveswithsplidButton'>Submit</button>
         </div>
-        <div class='form-group'>
+        <div class='form-group has-default'>
           <label for='cveid'>Enter cveId for a CVE</label>
           <input type='text' class='form-control' id='cveid' name='cveid' placeholder='Example: CVE-2015-9016'/>
           <button type='button' class='btn btn-success' id='cveidButton'>Submit</button>
         </div>
-        <div class='form-group'>
+        <div class='form-group has-default'>
           <label for='androidVersion'>Enter Android version for CVEs</label>
           <input type='text' class='form-control' id='androidVersion' name='androidVersion' placeholder='Example: 9'/>
           <button type='button' class='btn btn-success' id='androidVersionButton'>Submit</button>
         </div>
         <div>
-          <div class='form-group'>
+          <div class='form-group has-default'>
             <label for='spl1'>Enter spl1</label>
             <input type='text' class='form-control' id='spl1' name='spl1' placeholder="Example: 2018-02-05"/>
           </div>
-          <div class='form-group'>
+          <div class='form-group has-default'>
             <label for='spl2'>Enter spl2</label>
             <input type='text' class='form-control' id='spl2' name='spl2' placeholder="Example: 2018-02-01"/>
             <button type='button' class='btn btn-success' id='spl1spl2Button'>Submit</button>
           </div>
         </div>
-        <div class='form-group'>
+        <div class='form-group has-default'>
           <label for='bulletinidSPL'>Enter bulletinid for SPL</label>
           <input type='text' class='form-control' id='bulletinidSPL' name='bulletinidSPL' placeholder="Example: 2018-03"/>
           <button type='button' class='btn btn-success' id='bulletinidSPLButton'>Submit</button>
         </div>
-        <div class='form-group'>
+        <div class='form-group has-default'>
           <label for='androidVersionSPL'>Enter Android version for SPL</label>
           <input type='text' class='form-control' id='androidVersionSPL' name='androidVersionSPL' placeholder="Example: 9"/>
           <button type='button' class='btn btn-success' id='androidVersionSPLButton'>Submit</button>
         </div>
-        <div class='form-group'>
+        <div class='form-group has-default'>
           <label for='bulletinidBULLETIN'>Enter bulletin id for SPLs/CVEs</label>
           <input type='text' class='form-control' id='bulletinidBULLETIN' name='bulletinidBULLETIN' placeholder="Example: 2018-02"/>
           <button type='button' class='btn btn-success' id='bulletinidBULLETINButton'>Submit</button>
         </div>
-        <div class='form-group'>
+        <div class='form-group has-default'>
           <label for='androidVersionBULLETIN'>Enter Android version for SPLs/CVEs</label>
           <input type='text' class='form-control' id='androidVersionBULLETIN' name='androidVersionBULLETIN' placeholder="Example: 9"/>
           <button type='button' class='btn btn-success' id='androidVersionBULLETINButton'>Submit</button>
@@ -165,6 +177,14 @@
    document.getElementById('v1v2bulletinButton')
     .addEventListener("click", function() { sendRequest('v1v2bulletin', 'cves?', true);});
 
+   document.addEventListener('change', displayFileName);
+
+   document.getElementById('gcloudToken').addEventListener('click', scrollOnClick);
+
+   function scrollOnClick() {
+     window.scrollTo(0, document.body.scrollHeight);
+   }
+
    function generateToken() {
      firebase.auth().onAuthStateChanged(function(user) {
        if (user){
@@ -175,7 +195,13 @@
      });
    }
  
-   
+ function displayFileName() {
+   try{
+    const fileName = document.getElementById('userFile').files[0];
+    let fileNameContainer = document.getElementById('fileName');
+    fileNameContainer.innerHTML = fileName.name;
+   }catch{ fileNameContainer.innerHTML = 'Upload a file';}
+ }  
 
  // DO NOT DEPLOY THIS FUNCTION TO PRODUCTION!
  function sendUserToken() {
@@ -202,7 +228,6 @@
     var doc = "<body>File already in storage. </body>";
     var frame = document.getElementById('displayFrame');
     frame.src="javascript:'" + doc + "'";
-
    })
    .catch((error)=> {
      childRef.put(document.getElementById('userFile').files[0]);
