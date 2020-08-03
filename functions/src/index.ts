@@ -65,7 +65,7 @@ export const isAdmin = functions.https.onRequest((request: any, response: any) =
             }
             response.send(json);
             return json; 
-          }).catch(error => console.log(error));
+          }).catch(error => console.log("Cannot verify id" + error));
         }
 })
 
