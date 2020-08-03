@@ -39,6 +39,7 @@ export const grantAdminRole = functions.https.onRequest((request: any, response:
 })
 
 async function setAdminPriveleges(userEmail: string): Promise<void> {
+  console.log(admin.auth().getUserByEmail(userEmail));
   const user = await admin.auth().getUserByEmail(userEmail);
   if (userEmail.split('@')[1] === 'google.com') {
     if (user.customClaims && (user.customClaims as any).isAdmin === true) {
@@ -50,3 +51,22 @@ async function setAdminPriveleges(userEmail: string): Promise<void> {
     });
   }
 }
+
+export const isAdmin = functions.https.onRequest((request: any, response: any) => {
+    if (request.headers['usertoken']) {
+        admin.auth().verifyIdToken(String(request.headers['usertoken']))
+          .then(function(decodedToken) {
+            var json = null;
+            if (decodedToken.isAdmin){
+                json = {"value": "true"};
+            }
+            else {
+                json = {"value":"false"};
+            }
+            response.send(json);
+            return json; 
+          }).catch(error => console.log(error));
+        }
+})
+
+

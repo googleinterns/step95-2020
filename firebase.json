@@ -45,8 +45,16 @@
       "function": "grantAdminRole"
     },
     {
+      "source": "/data",
+      "function": "getData"
+    },
+    {
       "source":"/upload",
       "function":"getUploadFunction"
+    },
+    {
+      "source": "/checkAdmin",
+      "function": "isAdmin"
     }
     ]
   },
