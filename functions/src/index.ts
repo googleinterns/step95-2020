@@ -10,7 +10,6 @@ import * as bulletinFunction from './bulletin/index';
 import * as androidVersionFunction from './Android Version/index';
 import * as notificationFunction from './notification/index'; 
 import * as uploadFunction from './upload/index';
-// import * as authorizationFunction from './authorization/index';
 
 export const getCVEFunction = CVEFunction.getCVE;
 export const getSPLFunction = SPLFunction.getSPL;
@@ -24,7 +23,6 @@ export const notifyNewReleaseFunction = notificationFunction.notifyNewRelease;
 
 export const getUploadFunction = uploadFunction.getUpload;
 
-// export const grantAdminRoleFunction = authorizationFunction.grantAdminRole;
 export const grantAdminRole = functions.https.onRequest((request: any, response: any) => {
   if (request.headers['usertoken']) {
     admin.auth().verifyIdToken(String(request.headers['usertoken']))
