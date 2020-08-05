@@ -8,25 +8,18 @@
   <link href="./style.css" rel="stylesheet" type="text/css">
   <title>ASB API Web Demo</title>
  </head>
- <body>
+ <body onload='giveAdmin()'>
   <div class='asbDemoContainer'>
     <div class='androidTitle'>
       Android Security Bulletin API Web App
     </div>
   </div>
-
-  <div id='tokenDisplay'>
-    <textarea id='tokenContainer'></textarea>
-    <button type='button' class='btn btn-success' id='generateToken'>Get User Token</button>
-  </div>
-
-  <div class='adminContainer'>
-    <button type='button' class='btn btn-success' id='getAdminPrivileges'>Get Admin Privileges</button>
-  </div>
+ <div class='adminContainer'>
+   <button type='button' class='btn btn-success' id='getAdminPrivileges'>Get Admin Privileges</button>
+ </div>
 
   <div class='uploadContainer'>
     <div class='fileUpload'> 
-      <!-- <label for = "userFile">Upload file </label> -->
       <label class='uploadButton'>
         <input type = "file" id = "userFile" name = "userFile">
         <i class='button-test'></</i> Upload file
@@ -151,9 +144,6 @@
    };
    firebase.initializeApp(firebaseConfig);
    
-   document.getElementById('generateToken').addEventListener("click", generateToken);
-   document.getElementById('getAdminPrivileges').addEventListener("click", sendUserToken);
-
    document.getElementById('splStartButton')
     .addEventListener("click", function() { sendRequest('splstart','cves?', false);});
    document.getElementById('bulletinidButton')
@@ -179,34 +169,32 @@
 
    document.addEventListener('change', displayFileName);
 
-   document.getElementById('gcloudToken').addEventListener('click', scrollOnClick);
-
-   function scrollOnClick() {
-     window.scrollTo(0, document.body.scrollHeight);
-   }
-
-   function generateToken() {
-     firebase.auth().onAuthStateChanged(function(user) {
-       if (user){
-         firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
-           document.getElementById("tokenContainer").innerHTML = idToken;
-         });
-       }
-     });
-   }
- 
  function displayFileName() {
    try{
     const fileName = document.getElementById('userFile').files[0];
     let fileNameContainer = document.getElementById('fileName');
     fileNameContainer.innerHTML = fileName.name;
-   }catch{ fileNameContainer.innerHTML = 'Upload a file';}
+   }catch{}
  }  
 
+ function giveAdmin() {
+   generateToken();
+ }
+
+ function generateToken() {
+     firebase.auth().onAuthStateChanged(function(user) {
+       if (user){
+         firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
+           sendUserToken(idToken);
+         });
+       }
+     });
+   }
+
  // DO NOT DEPLOY THIS FUNCTION TO PRODUCTION!
- function sendUserToken() {
+ function sendUserToken(idToken) {
     firebase.auth().onAuthStateChanged(function(user) {
-        const userToken = document.getElementById('tokenContainer').value;
+        const userToken = idToken
         const gcloudToken = document.getElementById('gcloudToken').value;
         const options = {
             method: 'GET',
@@ -235,35 +223,40 @@
      var frame = document.getElementById('displayFrame');
      frame.src="javascript:'" + doc + "'";
     }));
-}
+  }
   
-   function sendRequest(inputId, route, hasTwoFields) {
-       const temp_info = generateFetchOptions(inputId, hasTwoFields);
-       const input = temp_info[0];
-       const options = temp_info[1];
+  function sendRequest(inputId, route, hasTwoFields) {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user){
+        firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
+          const temp_info = generateFetchOptions(inputId, hasTwoFields, idToken);
+          const input = temp_info[0];
+          const options = temp_info[1];
+
+          const searchParam = convertJsonToQuery(input)
+          if (location.hostname === 'localhost') {
+            urlRoute = 'http://localhost:5000/' + route;
+          } else {
+            urlRoute = 'https://step95-2020.web.app/' + route;
+          }
+
+          const url = new URL(urlRoute + searchParam);
+          fetch(url, options).then(data => data.json()).then(result => {
+            const htmlString = '<html><body>' + JSON.stringify(result, undefined, 1) + '</body></html>';
+            let displayFrame = document.getElementById('displayFrame');
+            displayFrame.src = "javascript:'"+htmlString+"'";
+          }).catch(console.error());
+        }).catch(console.error());
+      }
+    })
+  }
  
-       const searchParam = convertJsonToQuery(input)
-       if (location.hostname === 'localhost') {
-         urlRoute = 'http://localhost:5000/' + route;
-       } else {
-         urlRoute = 'https://step95-2020.web.app/' + route;
-       }
- 
-       const url = new URL(urlRoute + searchParam);
-       fetch(url, options).then(data => data.json()).then(result => {
-         const htmlString = '<html><body>' + JSON.stringify(result, undefined, 1) + '</body></html>';
-         let displayFrame = document.getElementById('displayFrame');
-         displayFrame.src = "javascript:'"+htmlString+"'";
-       }).catch(console.error());
-     }
- 
-   function generateFetchOptions(inputType, hasTwoFields){
+  function generateFetchOptions(inputType, hasTwoFields, idToken){
      const gcloudToken = document.getElementById('gcloudToken').value;
-     let userToken = '';
+     let userToken = idToken;
      let input = {};
      if (hasTwoFields === false && inputType !== 'supportedAndroidVersions') {
        const userInput = document.getElementById(inputType).value;
-       userToken = document.getElementById('tokenContainer').value;
        input = {
          [inputType] : userInput
        };
@@ -277,7 +270,6 @@
        }; 
        return [input, options];
      } else {
-       userToken = document.getElementById('tokenContainer').value;
        const options = {
          method: 'GET',
          headers: {

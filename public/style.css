@@ -8,12 +8,6 @@ body{
     width: 100%;
 }
 
-#loginBody {
-    background: rgb(87, 160, 87);
-    display: table;
-    width: 100%;
-}
-
 #loginContainer {
     color: white;
     display: table-cell;
@@ -23,6 +17,11 @@ body{
 #infoContainer {
     display: block;
     margin-top: 20%;
+}
+
+#loginBody {
+    background: rgb(87, 160, 87);
+    display: table;
 }
 
 p {
@@ -62,12 +61,6 @@ h4, .h4 {
     text-align: center;
 }
 
-#tokenDisplay {
-    margin-top: 4%;
-    margin-bottom: 4%;
-    text-align: center;
-}
-
 #tokenContainer {
     margin-right: auto;
     display: block;
@@ -77,6 +70,7 @@ h4, .h4 {
 
 .adminContainer {
     text-align: center;
+    margin: 4%;
 }
 
 .uploadContainer {

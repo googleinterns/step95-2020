@@ -42,7 +42,7 @@
     },
     {
       "source": "/grantAdminRole",
-      "function": "grantAdminRoleFunction"
+      "function": "grantAdminRole"
     },
     {
       "source":"/upload",
