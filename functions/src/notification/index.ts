@@ -15,6 +15,12 @@ sgMail.setApiKey(API_KEY);
 
 export const notifyNewRelease = functions.database.ref('/Bulletin_Version/{bulletinid}').onCreate((snap,context) => {
     const newBulletin = snap.val();
+    const id = newBulletin.Bulletin_ID;
+    const version = newBulletin.Latest_Version;
+    const date = newBulletin.Release_Date;
+    const content = 'Android Security Bulletin ' + id + " version " + version + ' is released.\n' 
+    + 'Release date: ' + date + '.';
+
     const db = admin.database();
     const ref = db.ref('/Email_list');
     const emailListPromise = ref.once('value')
@@ -28,7 +34,7 @@ export const notifyNewRelease = functions.database.ref('/Bulletin_Version/{bulle
             to: emailList,
             from: 'android-security@google.com',
             subject: 'New release of bulletin',
-            text: String(JSON.stringify(newBulletin))
+            text: content
         }
         
         return sgMail.send(msg);
@@ -40,6 +46,12 @@ export const notifyNewRelease = functions.database.ref('/Bulletin_Version/{bulle
 
 export const notifyNewVersion = functions.database.ref('/Bulletin_Version/{bulletinid}').onUpdate((change,context) => {
     const updateOnBulletin = change.after.val();
+    const id = updateOnBulletin.Bulletin_ID;
+    const version = updateOnBulletin.Latest_Version;
+    const date = updateOnBulletin.Release_Date;
+    const content = 'Android Security Bulletin ' + id + ' is updated to version ' + version + '.\n' 
+    + 'Release date: ' + date + '.';
+
     const db = admin.database();
     const ref = db.ref('/Email_list');
     const emailListPromise = ref.once('value')
@@ -53,7 +65,7 @@ export const notifyNewVersion = functions.database.ref('/Bulletin_Version/{bulle
             to: emailList,
             from: 'android-security@google.com',
             subject: 'Update on bulletin',
-            text: String(JSON.stringify(updateOnBulletin))
+            text: content
         }
         
         return sgMail.send(msg);
@@ -62,7 +74,3 @@ export const notifyNewVersion = functions.database.ref('/Bulletin_Version/{bulle
         console.log("error sending emails for a new bulletin version: " + error)
     });
 });
-
-
-
-
