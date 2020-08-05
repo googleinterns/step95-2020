@@ -6,11 +6,18 @@ export const grantAdminRole = functions.https.onRequest((request: any, response:
       admin.auth().verifyIdToken(String(request.headers['usertoken']))
         .then(function(decodedToken) {
           const email: any = decodedToken.email;
+          var jsonResponse = null;
           setAdminPriveleges(email).catch(error => {
               response.status(400).send("Error giving admin privileges:"+ error);
           })
-          if (decodedToken.isAdmin) { response.send("User has admin privileges");}
-          else { response.send("User does not have admin privileges");}
+          if (decodedToken.isAdmin) { 
+            jsonResponse = {"value": "User has admin privileges"};
+          }
+          else { 
+           jsonResponse = {"value": "User does not have admin privileges"};
+          }
+          response.send(jsonResponse);
+          return jsonResponse;
         }).catch(error => {response.status(400).send("Error verifiying token:" + error);}
       )
     }
