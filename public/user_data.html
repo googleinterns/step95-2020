@@ -166,6 +166,9 @@
    document.getElementById('v1v2bulletinButton')
     .addEventListener("click", function() { sendRequest('v1v2bulletin', 'cves?', true);});
 
+   document.getElementById('getAdminPrivileges')
+    .addEventListener("click", giveAdmin);
+  
    document.addEventListener('change', displayFileName);
 
  function displayFileName() {
