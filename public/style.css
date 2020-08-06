@@ -1,0 +1,122 @@
+/* For 'index.html' */
+
+html, body {
+    height: 100%;
+}
+
+body{
+    width: 100%;
+}
+
+#loginContainer {
+    color: white;
+    display: table-cell;
+    text-align: center;
+}
+
+#infoContainer {
+    display: block;
+    margin-top: 20%;
+}
+
+#loginBody {
+    background: rgb(87, 160, 87);
+    display: table;
+}
+
+p {
+    font-size: 15px;
+}
+
+h4, .h4 {
+    font-size: 3.125rem;
+}
+
+#googleContainer {
+    display: block;
+    margin-top: 4%;
+}
+
+.firebaseui-provider-sign-in-footer>.firebaseui-tos {
+    color: white;
+}
+
+/* For user_data.html */
+
+.asbDemoContainer {
+    height: 9%;
+    display: table;
+    font-size: x-large;
+    vertical-align: middle;
+    width: 100%;
+}
+
+.androidTitle {
+    background: rgb(87, 160, 87);
+    color: white;
+    width: 100%;
+    height: 100%;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.adminContainer {
+    text-align: center;
+    margin: 4%;
+}
+
+.uploadContainer {
+    background: white;
+    border-radius: 4%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 4%;
+    margin-bottom: 4%;
+    text-align: center;
+    width: max-content;
+}
+
+.fileUpload {
+    border-radius: 2%;
+    padding: 4%;
+    width: max-content;
+}
+
+.uploadButton {
+    cursor: pointer;
+}
+
+#userFile {
+    display: none;
+}
+
+#fileName {
+    width: max-content;
+    display: inline-block;
+}
+
+.demoContainer{
+    margin: 0 auto;
+    width: max-content;
+    background: white;
+    padding: 2%;
+    border-radius: 1%;
+}
+
+#supportedAOSPContainer {
+    text-align: center;
+}
+
+.outputContainer {
+    margin: 4%;
+    text-align: center;
+}
+
+#displayFrame {
+    background-color: white;
+    border: solid;
+    border-color: grey;
+    height: 100%;
+    width: 75%;
+}

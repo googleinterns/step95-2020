@@ -24,4 +24,3 @@ export const notifyNewReleaseFunction = notificationFunction.notifyNewRelease;
 export const grantAdminRoleFunction = adminFunction.grantAdminRole;
 
 export const getUploadFunction = uploadFunction.getUpload;
-

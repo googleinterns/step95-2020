@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html>
   <head>
-     <title>Log into ASB API</title>
+     <title>Log into ASB API</title>      
+     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+     <link href="material-kit/assets/css/material-kit.css?v=2.0.7" rel="stylesheet" />
+     <link href="./style.css" rel="stylesheet" type="text/css">
      <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
      <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-auth.js"></script>
      <script>
         var firebaseConfig = {
-         authDomain: "step95-2020.firebaseapp.com", 
-         databaseURL: "https://step95-2020.firebaseio.com", 
-         projectId: "step95-2020", 
-         storageBucket: "step95-2020.appspot.com", 
-         messagingSenderId: "525367632678", 
-         appId: "1:525367632678:web:476053e80e5f22c6f417e7", 
-         measurementId: "G-QJE1CBXKGN"
+            authDomain: "step95-2020.firebaseapp.com",
+            databaseURL: "https://step95-2020.firebaseio.com",
+            projectId: "step95-2020",
+            storageBucket: "step95-2020.appspot.com",
+            messagingSenderId: "525367632678",
+            appId: "1:525367632678:web:476053e80e5f22c6f417e7",
+            measurementId: "G-QJE1CBXKGN"
         };
         firebase.initializeApp(firebaseConfig);
      </script>
@@ -39,9 +43,29 @@
         ui.start('#firebaseui-auth-container', uiConfig);
      </script>
   </head>
-  <body>
-     <h1>Login to gain access to ASB API Web Demo!</h1>
-     <div id="firebaseui-auth-container"></div>
-     <div id="loader">Loading...</div>
-  </body>
+
+  <body id='loginBody'> 
+   <div id="loader">Loading...</div>
+   <div id='loginContainer'>
+      <div id='infoContainer'>
+         <div>
+            <h4 class='h4'>Login to access ASB API Web Demo</h4>
+            <p>Login with your Google account in order to access the ASB API Web Demo</p>
+         </div>
+      </div>
+      <div id='googleContainer'>
+         <div id="firebaseui-auth-container"></div>
+      </div>
+ </div>
+
+     <script src="material-kit/assets/js/core/jquery.min.js" type="text/javascript"></script>
+     <script src="material-kit/assets/js/core/popper.min.js" type="text/javascript"></script>
+     <script src="material-kit/assets/js/core/bootstrap-material-design.min.js" type="text/javascript"></script>
+     <script src="material-kit/assets/js/plugins/moment.min.js"></script>
+     <script src="material-kit/assets/js/plugins/bootstrap-datetimepicker.js" type="text/javascript"></script>
+     <script src="material-kit/assets/js/plugins/nouislider.min.js" type="text/javascript"></script>
+     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
+     <script async defer src="https://buttons.github.io/buttons.js"></script>
+     <script src="material-kit/assets/js/material-kit.js?v=2.0.7" type="text/javascript"></script>
+   </body>
 </html>

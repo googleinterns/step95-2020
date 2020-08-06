@@ -24,7 +24,6 @@ export const getBulletin = functions.https.onRequest((request, response) => {
   else{
     response.status(400).send('No valid parameters specified. Please specify a bulletin id/android version.');
   }
-
 });
 
 function getSplsCvesWithBulletinID(id: string, res: any) {
