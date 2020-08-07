@@ -1,9 +1,10 @@
+//This file saves the JSON file to firebase storage and downloads it  to temporary path
+
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as converterScript from '../scripts/uploadConverter';
 
 export const getUpload = functions.storage.object().onFinalize(async (object) => {
-
     const path = require('path');
     const os = require('os');
     const fs = require('fs');
@@ -20,6 +21,6 @@ export const getUpload = functions.storage.object().onFinalize(async (object) =>
     }
     console.log('File downloaded locally to', tempFilePath);
     await converterScript.getUploadConvert(tempFilePath);
-    fs.unlinkSync(tempFilePath);
+    fs.unlinkSync(tempFilePath); //remove temp file
 
 });

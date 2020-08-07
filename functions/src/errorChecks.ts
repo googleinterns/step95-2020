@@ -1,3 +1,5 @@
+//This file checks if the query parameters are formatted correctly
+
 export function checkCVEValidity(ID: any): boolean {
   const regex = /^CVE-\d{4}-\d{3,7}$/;
   if (!regex.test(ID)) {

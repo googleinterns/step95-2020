@@ -1,3 +1,5 @@
+//This file converts all data from JSON file into desired format for each tree
+
 import * as validCheck from './validData';
 
 export function getCVEs(data: { vulnerabilities: any; ASB: any; published: any; }, versionNumber: string): Record<string, object> {
@@ -9,7 +11,7 @@ export function getCVEs(data: { vulnerabilities: any; ASB: any; published: any; 
         }
         if (!regex.test(vul.CVE)) {
             const editedID = validCheck.checkCVEValidity(vul.CVE, regex); //check if CVE is valid but malformed
-            if (editedID.length === 1) { //only one ID 
+            if (editedID.length === 1) { //only one ID in ID slot
                 vul.CVE = editedID[0];
                 subCVEData[vul.CVE] = buildSubCVEData(vul, versionNumber, data.published);
 
@@ -38,14 +40,14 @@ function buildSubCVEData(vulnerability: any, versionNum: any, publishDate: any):
 }
 
 function buildSubCVEDataMultiple(vulnerability: any, versionNum: any, publishDate: any, ID: string): any {
+    //if there aare two ids in one slot
     const cveData: Record<string, object> = {};
     cveData['published_date'] = publishDate;
     cveData['BulletinVersion'] = Object(versionNum);
     for (const key of Object.keys(vulnerability)) {
         if (key === "CVE") {
             cveData[key] = Object(ID);
-        }
-        else {
+        } else {
             cveData[key] = vulnerability[key];
         }
     }
@@ -61,33 +63,33 @@ export function buildCVEHistoryTree(tree: any, versionHistory: string, cveTree: 
     if (tree === null) {
         const returnMap = new Map();
         //if no data present in history tree, send reconfigured cve tree
-        for (const ID in cveTree) {
-            const tempVersion = cveTree[ID]['BulletinVersion'];
-            delete cveTree[ID]['BulletinVersion'];
-            const tempLongVersionNumber = cveTree[ID]['ASB'] + ":" + tempVersion;
-            const tempArray = [tempLongVersionNumber, cveTree[ID]];
-            returnMap.set(ID, tempArray);
+        for (const id in cveTree) {
+            const tempVersion = cveTree[id]['BulletinVersion'];
+            delete cveTree[id]['BulletinVersion'];
+            const tempLongVersionNumber = cveTree[id]['ASB'] + ":" + tempVersion;
+            const tempArray = [tempLongVersionNumber, cveTree[id]];
+            returnMap.set(id, tempArray);
         }
         returnArray = [returnMap];
         return returnArray; 
     } else {
         const setMap = new Map();
         const updateMap = new Map();
-        for (const CVE in cveTree) {
-            if (!Object.values(cveTree).includes(CVE)) {
+        for (const cve in cveTree) {
+            if (!Object.values(cveTree).includes(cve)) {
                 //if CVE not in CVE History tree add data 
-                const tempVersion = cveTree[CVE]['BulletinVersion'];
-                delete cveTree[CVE]['BulletinVersion'];
-                const tempLongVersionNumber = cveTree[CVE]['ASB'] + ":" + tempVersion;
-                const tempArray = [tempLongVersionNumber, cveTree[CVE]];
-                setMap.set(CVE, tempArray);
+                const tempVersion = cveTree[cve]['BulletinVersion'];
+                delete cveTree[cve]['BulletinVersion'];
+                const tempLongVersionNumber = cveTree[cve]['ASB'] + ":" + tempVersion;
+                const tempArray = [tempLongVersionNumber, cveTree[cve]];
+                setMap.set(cve, tempArray);
             }
         }
-        for (const CVE in tree) {
+        for (const cve in tree) {
             //check if latest version in history tree
-            const currentTreeCVEData = tree[CVE];
+            const currentTreeCVEData = tree[cve];
             let hasKey = false;
-            if (jsonData[CVE] !== undefined) {
+            if (jsonData[cve] !== undefined) {
                 for (const key of Object.keys(currentTreeCVEData)) {
                     if (key === longVersionNumberHistory) {
                         hasKey = true;
@@ -97,13 +99,13 @@ export function buildCVEHistoryTree(tree: any, versionHistory: string, cveTree: 
                     //if doesn't have version add in the data
                     const cveData: Record<string, object> = {};
                     cveData['published_date'] = jsonData.published;
-                    for (const key of Object.keys(jsonData[CVE])) {
-                        cveData[key] = jsonData[CVE][key];
+                    for (const key of Object.keys(jsonData[cve])) {
+                        cveData[key] = jsonData[cve][key];
                     }
                     const constructedData = JSON.parse(JSON.stringify(cveData));
                     delete constructedData['BulletinVersion'];
                     const tempArray = [longVersionNumberHistory, constructedData];
-                    updateMap.set(CVE, tempArray);
+                    updateMap.set(cve, tempArray);
                 }
             }
         }
@@ -130,11 +132,12 @@ export function buildBulletinSPLTree(tree: any): Map<string, Array<any>> {
         const currentASB = cveData.ASB;
         let currentSPL = cveData.patch_level
         if (currentSPL === undefined || currentSPL === null) {
+            //missing patch level
             currentSPL = currentASB + "-01";
         }
         if (currentASB && currentSPL) {
             const previousSet = asbSPlMap.get(currentASB);
-            if (previousSet) {
+            if (previousSet) { //already has a mapping
                 asbSPlMap.set(currentASB, previousSet.add(currentSPL));
             } else {
                 const newSet = new Set();
@@ -163,12 +166,13 @@ export function buildSPLCVEIDTree(tree: any): Map<any, any> {
         const cveData = tree[cve];
         let currentSPL = cveData.patch_level;
         if (currentSPL === null || currentSPL === undefined) {
+            //missing patch level
             currentSPL = cveData.ASB + "-01";
         }
         splPublishDateMap.set(currentSPL, cveData.published_date);
         if (currentSPL) {
-            const previousSet = splCVEIDMap.get(currentSPL);
-            if (previousSet) {
+            const previousSet = splCVEIDMap.get(currentSPL); 
+            if (previousSet) { //already has a mapping
                 splCVEIDMap.set(currentSPL, previousSet.add(cve));
             } else {
                 const newSet = new Set();
@@ -199,11 +203,12 @@ export function buildSPLCVEIDTree(tree: any): Map<any, any> {
 export function buildAOSPVersionASBCVEIDTree(tree: any): Map<any, any> {
     const asbCVEIDMap = new Map<string, Set<any>>();
     const aospASBMap = new Map<string, Set<any>>();
+    //will create two maps that are later combined
     for (const cve in tree) {
         const tempCVEData = tree[cve];
         if (tempCVEData.ASB && cve) {
             const previousMap = asbCVEIDMap.get(tempCVEData.ASB);
-            if (previousMap) {
+            if (previousMap) { //already has a mapping
                 asbCVEIDMap.set(tempCVEData.ASB, previousMap.add(cve));
             } else {
                 const newSet = new Set();
@@ -216,7 +221,7 @@ export function buildAOSPVersionASBCVEIDTree(tree: any): Map<any, any> {
                 const aospVersion = tempCVEData.aosp_versions[aospNumber];
                 if (aospVersion && cve && tempCVEData.ASB) {
                     const previousMap = aospASBMap.get(aospVersion);
-                    if (previousMap) {
+                    if (previousMap) { //already has a mapping
                         aospASBMap.set(aospVersion, previousMap.add(tempCVEData.ASB));
                     } else {
                         const newSet = new Set();
@@ -234,18 +239,19 @@ export function buildAOSPVersionASBCVEIDTree(tree: any): Map<any, any> {
             for (const currentEntry of asbCVEIDSet) {
                 const set = asbCVEIDMap.get(currentEntry);
                 let array = null;
-                if (set !== undefined) {
+                if (set) {
                     const iterator = set[Symbol.iterator]();
                     array = Array.from(iterator);
                     for (let i = 0; i < array.length; i++) {
                         if (!validCheck.isAndroidVersionSupported(tree, key, array[i])) {
+                            //if android version is in aosp version list
                             array.splice(i, 1);
                             i--;
                         }
                     }
                     JSON.parse(JSON.stringify(array));
                 }
-                const tempKey = key.replace(/\./g, "_");
+                const tempKey = key.replace(/\./g, "_"); //keys cannot have periods in RTDB
                 const tempArray = [currentEntry, array];
                 returnMap.set(tempKey,tempArray);
             }
@@ -263,7 +269,7 @@ export function buildAOSPVersionCVEIDTree(tree: any): Map<string, Set<any>> {
             aospVersion = aospVersion.replace(/\./g, "_");
             if (cve) {
                 const previousSet = aospCVEIDMap.get(aospVersion);
-                if (previousSet) {
+                if (previousSet) { //already has mapping
                     aospCVEIDMap.set(aospVersion, previousSet.add(cve));
                 } else {
                     const newSet = new Set();
@@ -300,8 +306,7 @@ export function buildBulletinVersionTree(tree: any): Map<string, Array<string>> 
             if (bulletinVersionCurrentValue && currentVersion >= bulletinVersionCurrentValue[0]) {
                 const arrayToAdd: string[] = [currentVersion, cveData.published_date];
                 bulletinVersionMap.set(currentASB, arrayToAdd);
-            }
-            else if (bulletinVersionCurrentValue === null || bulletinVersionCurrentValue === undefined) {
+            } else if (bulletinVersionCurrentValue === null || bulletinVersionCurrentValue === undefined) {
                 const arrayToAdd: string[] = [currentVersion, cveData.published_date];
                 bulletinVersionMap.set(currentASB, arrayToAdd);
             }

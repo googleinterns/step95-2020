@@ -1,4 +1,7 @@
+//This file reads in the JSON file if inputted from the command line
+
 import * as yargs from 'yargs';
+
 const args = yargs.option('inputPath', { alias: 'i', demand: true, type: 'string' }).argv;
 
 export function getConvertedInputFile(): any {
