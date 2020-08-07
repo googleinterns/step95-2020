@@ -9,8 +9,10 @@ export const grantAdminRole = functions.https.onRequest((request: any, response:
           setAdminPriveleges(email).catch(error => {
               response.status(400).send("Error giving admin privileges:"+ error);
           })
-          if (decodedToken.isAdmin) { response.send("User has admin privileges");}
-          else { response.send("User does not have admin privileges");}
+          if (decodedToken.isAdmin) { 
+            response.send(true);
+          }
+          else { response.send(false);}
         }).catch(error => {response.status(400).send("Error verifiying token:" + error);}
       )
     }

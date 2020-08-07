@@ -1,138 +1,101 @@
 <!DOCTYPE html>
 <html>
-
  <head>
-  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-  <link href="material-kit/assets/css/material-kit.css?v=2.0.7" rel="stylesheet" />
-  <link href="./style.css" rel="stylesheet" type="text/css">
-  <title>ASB API Web Demo</title>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>ASB API Web Demo</title>
+   <div id='tokenDisplay'>
+     <textarea id='tokenContainer'></textarea>
+   </div>
  </head>
  <body>
-  <div class='asbDemoContainer'>
-    <div class='androidTitle'>
-      Android Security Bulletin API Web App
-    </div>
+   
+  <button id='generateToken'>Get User Token</button> 
+  <button id='getAdminPrivileges'>Get Admin Privileges</button>
+  <div id = 'uploadBox'> 
   </div>
- <div class='adminContainer'>
-   <button type='button' class='btn btn-success' id='getAdminPrivileges'>Get Admin Privileges</button>
- </div>
-
-  <div class='uploadContainer'>
-    <div class='fileUpload'> 
-      <label class='uploadButton'>
-        <input type = "file" id = "userFile" name = "userFile">
-        <i class='button-test'></</i> Upload file
-      </label>
-      <div id='fileName'></div>
-      <button onClick = "store()" class='btn btn-success btn-fab btn-fab-lg btn-round' id = "userFilebutton">
-        <i class='material-icons'>cloud_upload</i>
-      </button>
-    </div>
-  </div>
-
-  <div class='demoContainer'>
-    <form>
-      <div>
-        <div class='form-group has-default'>
-          <label for='gcloudToken'>Enter gcloud token </label>
-          <input type='text' class='form-control' id='gcloudToken' name='gcloudToken' placeholder='Use $gcloud auth print-identity-token'/>
-        </div>
-        <div class='form-group has-default'>
-          <label for='bulletinid'>Enter bulletinID for CVEs</label>
-          <input type='text' class='form-control' id='bulletinid' name='bulletinid' placeholder='Example: 2018-02'/>
-          <button type='button' class='btn btn-success' id='bulletinidButton'>Submit</button>
-        </div>
-        <div class='form-group has-default'>
-          <label for='v1v2bulletin'>Enter version 1, version 2 and bulletinid (above)
-            to check version id validity
-          </label>
-          <div class='form-group has-default' id='v1v2bulletin'>
-            <div class='form-group has-default'>
-              <label for='v1'>Enter version 1</label>
-              <input type='text' class='form-control' id='v1' name='v1' placeholder='Example: 1'/>
-            </div>
-            <div class='form-group has-default'>
-              <label for='v2'>Enter version 2</label>
-              <input type='text' class='form-control' id='v2' name='v2' placeholder='Example: 1_1'/>
-            </div>
-            <button type='button' class='btn btn-success' id='v1v2bulletinButton'>Submit</button>
-          </div>
-        </div>
-        <div class='form-group has-default'>
-          <label for='splstart'>Enter splStart for CVEs</label>
-          <input type='text' class='form-control' id='splstart' name='splstart' placeholder='Example: 2018-02-01'/>
-          <button type='button' class='btn btn-success' id='splStartButton'>Submit</button>
-        </div>
-        <div class='form-group has-default'>
-          <label for='splid'>Enter SPL for CVEs</label>
-          <input type='text' class='form-control' id='splid' name='splid' placeholder="Example: 2018-02-05"/>
-          <button type='button' class='btn btn-success' id='cveswithsplidButton'>Submit</button>
-        </div>
-        <div class='form-group has-default'>
-          <label for='cveid'>Enter cveId for a CVE</label>
-          <input type='text' class='form-control' id='cveid' name='cveid' placeholder='Example: CVE-2015-9016'/>
-          <button type='button' class='btn btn-success' id='cveidButton'>Submit</button>
-        </div>
-        <div class='form-group has-default'>
-          <label for='androidVersion'>Enter Android version for CVEs</label>
-          <input type='text' class='form-control' id='androidVersion' name='androidVersion' placeholder='Example: 9'/>
-          <button type='button' class='btn btn-success' id='androidVersionButton'>Submit</button>
-        </div>
-        <div>
-          <div class='form-group has-default'>
-            <label for='spl1'>Enter spl1</label>
-            <input type='text' class='form-control' id='spl1' name='spl1' placeholder="Example: 2018-02-05"/>
-          </div>
-          <div class='form-group has-default'>
-            <label for='spl2'>Enter spl2</label>
-            <input type='text' class='form-control' id='spl2' name='spl2' placeholder="Example: 2018-02-01"/>
-            <button type='button' class='btn btn-success' id='spl1spl2Button'>Submit</button>
-          </div>
-        </div>
-        <div class='form-group has-default'>
-          <label for='bulletinidSPL'>Enter bulletinid for SPL</label>
-          <input type='text' class='form-control' id='bulletinidSPL' name='bulletinidSPL' placeholder="Example: 2018-03"/>
-          <button type='button' class='btn btn-success' id='bulletinidSPLButton'>Submit</button>
-        </div>
-        <div class='form-group has-default'>
-          <label for='androidVersionSPL'>Enter Android version for SPL</label>
-          <input type='text' class='form-control' id='androidVersionSPL' name='androidVersionSPL' placeholder="Example: 9"/>
-          <button type='button' class='btn btn-success' id='androidVersionSPLButton'>Submit</button>
-        </div>
-        <div class='form-group has-default'>
-          <label for='bulletinidBULLETIN'>Enter bulletin id for SPLs/CVEs</label>
-          <input type='text' class='form-control' id='bulletinidBULLETIN' name='bulletinidBULLETIN' placeholder="Example: 2018-02"/>
-          <button type='button' class='btn btn-success' id='bulletinidBULLETINButton'>Submit</button>
-        </div>
-        <div class='form-group has-default'>
-          <label for='androidVersionBULLETIN'>Enter Android version for SPLs/CVEs</label>
-          <input type='text' class='form-control' id='androidVersionBULLETIN' name='androidVersionBULLETIN' placeholder="Example: 9"/>
-          <button type='button' class='btn btn-success' id='androidVersionBULLETINButton'>Submit</button>
-        </div>    
-        <div id='supportedAOSPContainer'>
-          <button type='button' class='btn btn-success' id='supportedAndroidVersionsButton'>Get Supported Android Versions</button>
-        </div>  
-      </div>
-    </form>
-  </div>
-
-  <div class='outputContainer'>
-    <div style='clear: right'>
-      <iframe name='displayFrame' id='displayFrame'></iframe>
-    </div>
-  </div>
-
-   <script src="material-kit/assets/js/core/jquery.min.js" type="text/javascript"></script>
-   <script src="material-kit/assets/js/core/popper.min.js" type="text/javascript"></script>
-   <script src="material-kit/assets/js/core/bootstrap-material-design.min.js" type="text/javascript"></script>
-   <script async defer src="https://buttons.github.io/buttons.js"></script>
-   <script src="material-kit/assets/js/material-kit.js?v=2.0.7" type="text/javascript"></script>
+   
+   <div>
+     <div>
+       <label for='gcloudToken'>Enter gcloud token (use $ gcloud auth print-identity-token)</label>
+       <input type='text' id='gcloudToken' name='gcloudToken'/>
+       <button type = 'button' onClick = 'sendUserToken()'>Submit </button>
+     </div>
+     <div>
+       <label for='bulletinid'>Enter bulletinID for CVEs</label>
+       <input type='text' id='bulletinid' name='bulletinid'/>
+       <button id='bulletinidButton'>Submit</button>
+     </div>
+     <div>
+       <label for='v1v2bulletin'>Enter v1, v2 and bulletinid (above)
+         to check version id validity
+       </label>
+       <div id='v1v2bulletin'>
+         <input type='text' id='v1' name='v1'/>
+         <input type='text' id='v2' name='v2'/>
+         <button id='v1v2bulletinButton'>Submit</button>
+       </div>
+     </div>
+     <div>
+       <label for='splstart'>Enter splStart for CVEs</label>
+       <input type='text' id='splstart' name='splstart'/>
+       <button id='splStartButton'>Submit</button>
+     </div>
+     <div>
+       <label for='splid'>Enter SPL for CVEs</label>
+       <input type='text' id='splid' name='splid'/>
+       <button id='cveswithsplidButton'>Submit</button>
+     </div>
+     <div>
+       <label for='cveid'>Enter cveId for a CVE</label>
+       <input type='text' id='cveid' name='cveid'/>
+       <button id='cveidButton'>Submit</button>
+     </div>
+     <div>
+       <label for='androidVersion'>Enter Android version for CVEs</label>
+       <input type='text' id='androidVersion' name='androidVersion'/>
+       <button id='androidVersionButton'>Submit</button>
+     </div>
+     <div>
+       <label for='spl1'>Enter spl1</label>
+       <input type='text' id='spl1' name='spl1'/>
+       <label for='spl2'>Enter spl2</label>
+       <input type='text' id='spl2' name='spl2'/>
+       <button id='spl1spl2Button'>Submit</button>
+     </div>
+     <div>
+       <label for='bulletinidSPL'>Enter bulletinid for SPL</label>
+       <input type='text' id='bulletinidSPL' name='bulletinidSPL'/>
+       <button id='bulletinidSPLButton'>Submit</button>
+     </div>
+     <div>
+       <label for='androidVersionSPL'>Enter Android version for SPL</label>
+       <input type='text' id='androidVersionSPL' name='androidVersionSPL'/>
+       <button id='androidVersionSPLButton'>Submit</button>
+     </div>
+     <div>
+       <label for='bulletinidBULLETIN'>Enter bulletin id for SPLs/CVEs</label>
+       <input type='text' id='bulletinidBULLETIN' name='bulletinidBULLETIN'/>
+       <button id='bulletinidBULLETINButton'>Submit</button>
+     </div>
+     <div>
+       <label for='androidVersionBULLETIN'>Enter Android version for SPLs/CVEs</label>
+       <input type='text' id='androidVersionBULLETIN' name='androidVersionBULLETIN'/>
+       <button id='androidVersionBULLETINButton'>Submit</button>
+     </div>
+     <div>
+       <button id='supportedAndroidVersionsButton'>Get Supported Android Versions</button>
+     </div>
+   </div>
+   <div style='clear: right'>
+     <iframe name='displayFrame' id='displayFrame' width='50%' height="100%"></iframe>
+   </div>
  </body>
  
  <script src="https://www.gstatic.com/firebasejs/7.4.0/firebase.js"></script>
  <script type="text/javascript">
    const firebaseConfig = {
+    apiKey: "AIzaSyBfQKMxa1azXidOZJjT8UYDm5BnU4s2bKA",
        authDomain: "step95-2020.firebaseapp.com",
        databaseURL: "https://step95-2020.firebaseio.com",
        projectId: "step95-2020",
@@ -143,6 +106,9 @@
    };
    firebase.initializeApp(firebaseConfig);
    
+   document.getElementById('generateToken').addEventListener("click", generateToken);
+   document.getElementById('getAdminPrivileges').addEventListener("click", sendUserToken);
+
    document.getElementById('splStartButton')
     .addEventListener("click", function() { sendRequest('splstart','cves?', false);});
    document.getElementById('bulletinidButton')
@@ -166,37 +132,22 @@
    document.getElementById('v1v2bulletinButton')
     .addEventListener("click", function() { sendRequest('v1v2bulletin', 'cves?', true);});
 
-   document.getElementById('getAdminPrivileges')
-    .addEventListener("click", giveAdmin);
-  
-   document.addEventListener('change', displayFileName);
-
- function displayFileName() {
-   try{
-    const fileName = document.getElementById('userFile').files[0];
-    let fileNameContainer = document.getElementById('fileName');
-    fileNameContainer.innerHTML = fileName.name;
-   }catch{}
- }  
-
- function giveAdmin() {
-   generateToken();
- }
-
- function generateToken() {
+   function generateToken() {
      firebase.auth().onAuthStateChanged(function(user) {
        if (user){
          firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
-           sendUserToken(idToken);
+           document.getElementById("tokenContainer").innerHTML = idToken;
          });
        }
      });
    }
+ 
+   
 
  // DO NOT DEPLOY THIS FUNCTION TO PRODUCTION!
- function sendUserToken(idToken) {
+ function sendUserToken() {
     firebase.auth().onAuthStateChanged(function(user) {
-        const userToken = idToken
+        const userToken = document.getElementById('tokenContainer').value;
         const gcloudToken = document.getElementById('gcloudToken').value;
         const options = {
             method: 'GET',
@@ -206,7 +157,15 @@
                 'Content-Type': 'application/json'
             }
         };
-        fetch('/grantAdminRole', options);
+        fetch('/grantAdminRole', options).then(response => response.json())
+              .then(function(output){
+                if (output === true){
+                  var htmlString = '<label for = "userFile">Upload file </label>'
+                                 + '<input type = "file" id = "userFile" name = "userFile">'
+                                 + '<button onClick = "store()" id = "userFilebutton">Submit</button>'
+                  document.getElementById('uploadBox').innerHTML = htmlString;
+                };
+        });
     });
   }
   
@@ -218,6 +177,7 @@
     var doc = "<body>File already in storage. </body>";
     var frame = document.getElementById('displayFrame');
     frame.src="javascript:'" + doc + "'";
+
    })
    .catch((error)=> {
      childRef.put(document.getElementById('userFile').files[0]);
@@ -225,40 +185,35 @@
      var frame = document.getElementById('displayFrame');
      frame.src="javascript:'" + doc + "'";
     }));
-  }
-  
-  function sendRequest(inputId, route, hasTwoFields) {
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user){
-        firebase.auth().currentUser.getIdToken(true).then(function(idToken) {
-          const temp_info = generateFetchOptions(inputId, hasTwoFields, idToken);
-          const input = temp_info[0];
-          const options = temp_info[1];
-
-          const searchParam = convertJsonToQuery(input)
-          if (location.hostname === 'localhost') {
-            urlRoute = 'http://localhost:5000/' + route;
-          } else {
-            urlRoute = 'https://step95-2020.web.app/' + route;
-          }
-
-          const url = new URL(urlRoute + searchParam);
-          fetch(url, options).then(data => data.json()).then(result => {
-            const htmlString = '<html><body>' + JSON.stringify(result, undefined, 1) + '</body></html>';
-            let displayFrame = document.getElementById('displayFrame');
-            displayFrame.src = "javascript:'"+htmlString+"'";
-          }).catch(console.error());
-        }).catch(console.error());
-      }
-    })
-  }
+}
+   
+   function sendRequest(inputId, route, hasTwoFields) {
+       const temp_info = generateFetchOptions(inputId, hasTwoFields);
+       const input = temp_info[0];
+       const options = temp_info[1];
  
-  function generateFetchOptions(inputType, hasTwoFields, idToken){
+       const searchParam = convertJsonToQuery(input)
+       if (location.hostname === 'localhost') {
+         urlRoute = 'http://localhost:5000/' + route;
+       } else {
+         urlRoute = 'https://step95-2020.web.app/' + route;
+       }
+ 
+       const url = new URL(urlRoute + searchParam);
+       fetch(url, options).then(data => data.json()).then(result => {
+         const htmlString = '<html><body>' + JSON.stringify(result, undefined, 1) + '</body></html>';
+         let displayFrame = document.getElementById('displayFrame');
+         displayFrame.src = "javascript:'"+htmlString+"'";
+       }).catch(console.error());
+     }
+ 
+   function generateFetchOptions(inputType, hasTwoFields){
      const gcloudToken = document.getElementById('gcloudToken').value;
-     let userToken = idToken;
+     let userToken = '';
      let input = {};
      if (hasTwoFields === false && inputType !== 'supportedAndroidVersions') {
        const userInput = document.getElementById(inputType).value;
+       userToken = document.getElementById('tokenContainer').value;
        input = {
          [inputType] : userInput
        };
@@ -272,6 +227,7 @@
        }; 
        return [input, options];
      } else {
+       userToken = document.getElementById('tokenContainer').value;
        const options = {
          method: 'GET',
          headers: {
