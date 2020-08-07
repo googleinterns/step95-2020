@@ -10,12 +10,9 @@ export const grantAdminRole = functions.https.onRequest((request: any, response:
               response.status(400).send("Error giving admin privileges:"+ error);
           })
           if (decodedToken.isAdmin) { 
-            var htmlString = '<label for = "userFile">Upload file </label>'
-            +'<input type = "file" id = "userFile" name = "userFile">'
-            +'<button onClick = "store()" id = "userFilebutton">Submit</button>';
-            response.send(htmlString);
+            response.send(true);
           }
-          else { response.send('');}
+          else { response.send(false);}
         }).catch(error => {response.status(400).send("Error verifiying token:" + error);}
       )
     }

@@ -95,6 +95,7 @@
  <script src="https://www.gstatic.com/firebasejs/7.4.0/firebase.js"></script>
  <script type="text/javascript">
    const firebaseConfig = {
+    apiKey: "AIzaSyBfQKMxa1azXidOZJjT8UYDm5BnU4s2bKA",
        authDomain: "step95-2020.firebaseapp.com",
        databaseURL: "https://step95-2020.firebaseio.com",
        projectId: "step95-2020",
@@ -156,8 +157,14 @@
                 'Content-Type': 'application/json'
             }
         };
-        fetch('/grantAdminRole', options).then(response => response.text()).then(function(output){
-          var element = document.getElementById('uploadBox').innerHTML = output;
+        fetch('/grantAdminRole', options).then(response => response.json())
+              .then(function(output){
+                if (output === true){
+                  var htmlString = '<label for = "userFile">Upload file </label>'
+                                 + '<input type = "file" id = "userFile" name = "userFile">'
+                                 + '<button onClick = "store()" id = "userFilebutton">Submit</button>'
+                  document.getElementById('uploadBox').innerHTML = htmlString;
+                };
         });
     });
   }
