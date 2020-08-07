@@ -1,3 +1,4 @@
+//This file reads in the JSON file if inputted from the UI
 
 export function getConvertedInputFile(filePath: string): any {
     const rawBulletin = readInputFile(filePath); //read bulletin json file

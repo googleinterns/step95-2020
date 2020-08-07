@@ -16,7 +16,7 @@
 4) Run the command: ts-node --project ../../tsconfig.json scriptConverter.ts --inputPath <file path for input file>
 5)NOTE: You are in the scripts folder of step95-2020/functions/src. The input path should be a JSON representation
    of the bulletin data. 
-6) If the script is successful, the console should print that all seven trees have been uploaded. You should see the new data in the realtime database UI. 
+6) If the script is successful, the console should print that all trees have been uploaded. You should see the new data in the realtime database UI. 
 
 ## To Run on the UI
 1) Navigate to step95-2020.web.app and log in as admin to home page

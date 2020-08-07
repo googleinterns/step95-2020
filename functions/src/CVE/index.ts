@@ -19,54 +19,48 @@ export const getCVE = functions.https.onRequest((request, response) => {
   if (bulletinID) {
     if (!checks.checkBulletinIDValidity(bulletinID)) {
       response.status(400).send('Bulletin ID is malformed.');
-    }else{
+    } else {
       if (v1 && v2) {
         if (!checks.checkVersionIDValidity(v1) || !checks.checkVersionIDValidity(v2)) {
           response.status(400).send('Version ID is malformed.');
-        }else{
+        } else {
           version1And2VulDifference(String(bulletinID), String(v1), String(v2), response);
         }
-      }else{
+      } else {
         getCvesWithBulletinID(String(bulletinID), response);
       }
     }
-  }
-  else if (splID) {
+  } else if (splID) {
     if (!checks.checkSPLValidity(splID)) {
       response.status(400).send('SPL ID is malformed.');
-    }else{
+    } else {
       getCvesWithSplID(String(splID), response);
     }
-  }
-  else if (splStart) {
+  } else if (splStart) {
     if (!checks.checkSPLValidity(splStart)) {
       response.status(400).send('SPL ID is malformed.');
-    }else{
+    } else {
       getCVEsBeforeSPL(String(splStart), response);
     }
-  }
-  else if (cveID) {
+  } else if (cveID) {
     if (!checks.checkCVEValidity(cveID)) {
       response.status(400).send('CVE ID is malformed.');
-    }else{
+    } else {
       getCveWithCveID(String(cveID), response);
     }
-  }
-  else if (spl1 && spl2) {
+  } else if (spl1 && spl2) {
     if (!checks.checkSPLValidity(spl1) || !checks.checkSPLValidity(spl2)) {
       response.status(400).send('SPL ID is malformed.');
-    }else{
+    } else {
       getChangesBetweenSPLs(String(spl1), String(spl2), response);
     }
-  }
-  else if (androidVersion) {
+  } else if (androidVersion) {
     if (!checks.checkAndroidVersionValidity(androidVersion)) {
       response.status(400).send('Android Version ID is malformed.');
-    }else{
+    } else {
       getCvesWithAndroidVersion(String(androidVersion), response);
     }
-  }
-  else{
+  } else {
     response.status(400).send('No valid parameters specified. Please specify a bulletin/spl/cve/android version.');
   }
 });
@@ -87,9 +81,9 @@ function getCvesWithBulletinID(id: string, res: any) {
     }
     res.send(result);
   }).catch(error => {
-    if(error instanceof NotFoundError){
+    if (error instanceof NotFoundError) {
       res.status(404).send(error.message);
-    }else{
+    } else {
       res.status(500).send('error getting CVEs for bulletinID:' + error);
     }
   });
@@ -111,15 +105,15 @@ function getCvesWithSplID(id: string, res: any) {
     }
     res.send(result);
   }).catch(error => {
-    if(error instanceof NotFoundError){
+    if (error instanceof NotFoundError) {
       res.status(404).send(error.message);
-    }else{
+    } else {
       res.status(500).send('error getting CVEs for SPL:' + error);
     }
   });
 }
 
-function getCVEsBeforeSPL(id: string, res: any){
+function getCVEsBeforeSPL(id: string, res: any) {
   var db = admin.database();
   var ref = db.ref('/CVEs');
   const getCVEsPromise = ref.once('value');
@@ -142,9 +136,9 @@ function getCVEsBeforeSPL(id: string, res: any){
     }
     res.send(result);
   }).catch(error => {
-    if(error instanceof NotFoundError){
+    if (error instanceof NotFoundError) {
       res.status(404).send(error.message);
-    }else{
+    } else {
       res.status(500).send('error getting CVEs with starting SPL:' + error);
     }
   });
@@ -153,28 +147,29 @@ function getCVEsBeforeSPL(id: string, res: any){
 function version1And2VulDifference(bulletin: string, version1: string, version2: string, res: any) {
   const db = admin.database();
   const ref = db.ref('/CVE_History');
-  const wholeVersion1 = bulletin + ':' + version1;
+  const wholeVersion1 = bulletin + ':' + version1; //key is ASB:Version
   const wholeVersion2 = bulletin + ':' + version2;
   const version1And2Vul = ref.once('value');
   const version1And2FinalSet = version1And2Vul.then((snapshot) => {
     const cves = snapshot.val();
-    const cves1 = Enumerable.from(cves)
+    const cves1 = Enumerable.from(cves) //get all cves of first version
       .where(function (obj) { return obj.value[wholeVersion1] !== undefined })
       .select(function (obj) { return obj.value[wholeVersion1] })
       .toArray();
     if (cves1.length === 0) {
       throw new NotFoundError('There are no CVEs associated with this bulletin ID and version in the database.');
     }
-    const cves2 = Enumerable.from(cves)
+    const cves2 = Enumerable.from(cves) //get all cves of second version
       .where(function (obj) { return obj.value[wholeVersion2] !== undefined })
       .select(function (obj) { return obj.value[wholeVersion2] })
       .toArray();
     if (cves2.length === 0) {
       throw new NotFoundError('There are no CVEs associated with this bulletin ID and version in the database.');
     }
-    const cves1Set = createSet(cves1);
+    const cves1Set = createSet(cves1); //create sets from arrays of cves
     const cves2Set = createSet(cves2);
     const cvesFinal = symmetricDifferenceBetweenSets(cves1Set, cves2Set);
+    //find the difference between the two -> added or deleted cves
 
     const overlappingCVEs = intersectionBetweenSets(cves1Set, cves2Set);
 
@@ -183,6 +178,7 @@ function version1And2VulDifference(bulletin: string, version1: string, version2:
 
     for (const element of overlappingCVEs) {
       if (!deepEqual(cves1Map.get(element), cves2Map.get(element))) {
+        //if there has been any chnage to cve add to list
         cvesFinal.add(element);
       }
     }
@@ -201,12 +197,12 @@ function version1And2VulDifference(bulletin: string, version1: string, version2:
     }
     const result = { 'CVEs': cveList };
     res.send(result);
-  }).catch(error => { 
-    if(error instanceof NotFoundError){
+  }).catch(error => {
+    if (error instanceof NotFoundError) {
       res.status(404).send(error.message);
-    }else{
+    } else {
       res.status(500).send('Error getting CVEs for bulletin between v1 and v2: ' + error);
-    } 
+    }
   });
 }
 
@@ -245,7 +241,7 @@ function intersectionBetweenSets(setA: any, setB: any): Set<any> {
 function getCveWithCveID(id: any, res: any) {
   const db = admin.database();
   const ref = db.ref('/CVEs');
-  
+
   const getCVEsPromise = ref.orderByKey().equalTo(id).once('value');
   getCVEsPromise.then((snapshot) => {
     const cveData = snapshot.val();
@@ -254,9 +250,9 @@ function getCveWithCveID(id: any, res: any) {
     }
     res.send(cveData[id]);
   }).catch(error => {
-    if(error instanceof NotFoundError){
+    if (error instanceof NotFoundError) {
       res.status(404).send(error.message);
-    }else{
+    } else {
       res.status(500).send('error getting details for CVEID:' + error);
     }
   });
@@ -302,9 +298,9 @@ function getChangesBetweenSPLs(id1: string, id2: string, res: any) {
     const cvesBetweenSpls = { CVEs: cveList };
     res.send(cvesBetweenSpls);
   }).catch(error => {
-    if(error instanceof NotFoundError){
+    if (error instanceof NotFoundError) {
       res.status(404).send(error.message);
-    }else{
+    } else {
       res.status(500).send('error getting CVEs between SPLs: ' + error)
     }
   });
@@ -335,12 +331,12 @@ function getCvesWithAndroidVersion(version: string, res: any) {
     }
     res.send({ CVEs: cveList });
   }).catch(error => {
-    if(error instanceof NotFoundError){
+    if (error instanceof NotFoundError) {
       res.status(404).send(error.message);
-    }else{
+    } else {
       res.status(500).send('error getting CVEs for AndroidVersion: ' + error);
     }
   });
 }
 
-class NotFoundError extends Error {}
+class NotFoundError extends Error { }

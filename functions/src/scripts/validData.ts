@@ -1,3 +1,5 @@
+//This file validates and checks data from the bulletin JSON file
+
 export function checkCVEValidity(ID: string, regExpression: any): any {
     //These are the types of malformations found thus far
     const finalID: any[] = [];

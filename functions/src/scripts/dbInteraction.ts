@@ -1,3 +1,5 @@
+//This file sends all converted trees to RTDB
+
 import * as admin from 'firebase-admin';
 import * as dataConversion from './dataConvert';
 import * as cleanupFunction from './cleanupData';
@@ -42,8 +44,7 @@ function sendCVEHistoryToDB(treeToSend:any): any {
         for (const key of map.keys())
         promises.push(ref.child(key).child(map.get(key)[0]).set(map.get(key)[1]).catch(
             error => { console.log("Error adding all current CVE Tree data into blank history tree:" + error) }));
-    }
-    else {
+    } else {
         const setMap = treeToSend[0];
         const updateMap = treeToSend[1];
         for (const key of setMap.keys()){
@@ -68,7 +69,6 @@ function writeToDatabaseCVETree(data: any, versionNum: string, longNum: any): Pr
         const promises = [];
         promises.push(dataConversion.buildCVETree(data, versionNum, result));
         return Promise.all(promises);
-
     })
 
     return currentTreeCheck.then(async (versionCheck) => {
@@ -79,8 +79,7 @@ function writeToDatabaseCVETree(data: any, versionNum: string, longNum: any): Pr
             }
             console.log("CVE Tree uploaded");
             return pullFromDatabase(longNum, versionNum.toString(), data);
-        }
-        else {
+        } else {
             console.log("Version older than most recent one in db - can't load in data");
         }
     }).catch(error => { console.log("Error checking bulletin version and writing cve tree to db" + error) });
