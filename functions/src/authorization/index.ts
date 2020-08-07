@@ -9,8 +9,13 @@ export const grantAdminRole = functions.https.onRequest((request: any, response:
           setAdminPriveleges(email).catch(error => {
               response.status(400).send("Error giving admin privileges:"+ error);
           })
-          if (decodedToken.isAdmin) { response.send("User has admin privileges");}
-          else { response.send("User does not have admin privileges");}
+          if (decodedToken.isAdmin) { 
+            var htmlString = '<label for = "userFile">Upload file </label>'
+            +'<input type = "file" id = "userFile" name = "userFile">'
+            +'<button onClick = "store()" id = "userFilebutton">Submit</button>';
+            response.send(htmlString);
+          }
+          else { response.send('');}
         }).catch(error => {response.status(400).send("Error verifiying token:" + error);}
       )
     }
