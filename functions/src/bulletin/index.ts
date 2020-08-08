@@ -4,8 +4,8 @@ import * as checks from '../errorChecks';
 
 export const getBulletin = functions.https.onRequest((request, response) => {
 
-  const bulletinID = request.query.bulletinid;
-  const androidVersion = request.query.androidVersion;
+  const bulletinID = request.query.bulletinidBULLETIN;
+  const androidVersion = request.query.androidVersionBULLETIN;
 
   if (bulletinID) {
     if (!checks.checkBulletinIDValidity(bulletinID)) {
