@@ -37,7 +37,7 @@
     "express": "^4.17.1",
     "fetch": "^1.1.0",
     "firebase": "^7.16.1",
-    "firebase-admin": "^8.13.0",
+    "firebase-admin": "^11.11.1",
     "firebase-functions": "^3.8.0",
     "firebaseui": "^4.6.0",
     "linq": "^3.2.2",
