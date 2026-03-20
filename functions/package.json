@@ -43,7 +43,7 @@
     "linq": "^3.2.2",
     "mocha": "^8.1.0",
     "node-fetch": "^2.6.0",
-    "rewire": "^5.0.0",
+    "rewire": "^9.0.1",
     "sinon": "^9.0.2",
     "ts-node": "^8.10.2",
     "yargs": "^15.4.1"
@@ -51,7 +51,7 @@
   "devDependencies": {
     "@types/node": "^13.11.1",
     "firebase-functions-test": "^0.2.0",
-    "gts": "^2.0.2",
+    "gts": "^7.0.0",
     "tslint": "^5.12.0",
     "typescript": "^3.9.7"
   },
