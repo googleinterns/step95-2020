@@ -23,7 +23,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "@firebase/testing": "^0.20.9",
-    "@sendgrid/mail": "^7.2.1",
+    "@sendgrid/mail": "^8.1.6",
     "@siderite/linqer": "^1.2.2",
     "@types/chai": "^4.2.12",
     "@types/deep-equal": "^1.0.1",
